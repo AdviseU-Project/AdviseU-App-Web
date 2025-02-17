@@ -5,18 +5,25 @@ import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import CourseCard from '@/components/CourseCard';
-import { useTermsStore } from '@/app/store';
+import { usePropStore, useTermsStore } from '@/app/store';
 import { Course } from '@/lib/types';
 import { X } from 'lucide-react';
 import { useFetchCourses } from '@/hooks/queries/useFetchCourses';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useUpdateTerm } from '@/hooks/mutations/terms';
 
-const CourseSearchSection = () => {
-    const { addCourseToTerm, selectedTerm } = useTermsStore();
+interface CourseSearchSectionProps {
+    planId: string;
+}
+
+const CourseSearchSection: React.FC<CourseSearchSectionProps> = ({ planId }) => {
+    const { selectedTerm } = useTermsStore();
     const [search, setSearch] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const { data, isLoading, isFetching } = useFetchCourses(searchQuery);
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+    const { mutate } = useUpdateTerm();
+
     const handleCancelSearch = () => {
         setSearch('');
         setSelectedCourse(null);
@@ -34,7 +41,13 @@ const CourseSearchSection = () => {
 
     const handleAddCourse = () => {
         if (selectedCourse && selectedTerm) {
-            addCourseToTerm(selectedTerm, selectedCourse);
+            mutate({
+                term: {
+                    ...selectedTerm,
+                    courses: [...selectedTerm.courses, selectedCourse],
+                },
+                planId: planId,
+            });
 
             // Reset search form fields
             setSelectedCourse(null);
@@ -98,7 +111,7 @@ const CourseSearchSection = () => {
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                     >
-                                        <CourseCard course={course} />
+                                        <CourseCard course={course} planId={planId} />
                                     </motion.div>
                                 ))
                             )}

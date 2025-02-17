@@ -8,7 +8,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Course, Term } from '@/lib/types';
 import { EllipsisVertical } from 'lucide-react';
-import { useTermsStore } from '@/app/store';
+import { usePropStore, useTermsStore } from '@/app/store';
+import { useUpdateTerm } from '@/hooks/mutations/terms';
 
 interface CourseCardProps {
     term?: Term;
@@ -18,6 +19,7 @@ interface CourseCardProps {
     selectable?: boolean;
     onClick?: () => void;
     displayOptions?: boolean;
+    planId: string;
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({
@@ -28,15 +30,24 @@ const CourseCard: React.FC<CourseCardProps> = ({
     selectable,
     onClick,
     displayOptions,
+    planId
 }) => {
     if (!onClick) {
         onClick = () => {};
     }
 
+    const { mutate } = useUpdateTerm();
+
     const handleRemoveCourse = (course: Course, term?: Term) => {
         if (!term || !course) return;
 
-        removeCourseFromTerm(term, course);
+        mutate({
+            term: {
+                ...term,
+                courses: term.courses.filter((c) => c.course_number !== course.course_number),
+            },
+            planId: planId,
+        });
     };
 
     const cardVariants = [
@@ -44,8 +55,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
         selected ? 'border-zinc-400 scale-105 bg-zinc-50' : '',
         selectable ? 'cursor-pointer hover:scale-105 hover:border-zinc-400' : '',
     ];
-
-    const { removeCourseFromTerm } = useTermsStore();
 
     return (
         <div key={courseIndex} className={`${cardVariants.join(' ')}`} onClick={onClick}>

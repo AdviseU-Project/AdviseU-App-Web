@@ -15,8 +15,6 @@ const ListPlansSection: React.FC = () => {
     const { data } = useSession();
     const { mutate } = useDeletePlan();
 
-    console.log(data);
-
     return (
         <AnimatePresence>
             <div className="grid gap-6 md:grid-cols-2">

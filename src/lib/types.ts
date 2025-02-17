@@ -1,10 +1,16 @@
-export type Term = {
-    id: number;
+import { ObjectId } from 'mongodb';
+
+export type Term = NewTerm & {
+    _id: ObjectId;
+};
+
+export type NewTerm = {
     name: string;
     courses: Course[];
 };
 
 export type Course = {
+    _id: ObjectId;
     credits: string;
     course_name: string;
     course_number: string;
@@ -45,7 +51,7 @@ export type Plan = NewPlan & {
 export type NewPlan = {
     name: string;
     description: string;
-    terms?: Term[];
+    terms: Term[];
 };
 
 type Option = {
