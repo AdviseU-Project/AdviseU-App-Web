@@ -16,10 +16,7 @@ const fetchCourses = async (query: string | null): Promise<Course[]> => {
     }
 
     const courses = await collection.find(filter).toArray();
-    return courses.map((course) => {
-        const { _id, ...rest } = course; // Omit _id
-        return rest as Course;
-    });
+    return courses as Course[];
 };
 
 export async function GET(req: Request) {
