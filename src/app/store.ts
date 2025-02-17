@@ -19,14 +19,14 @@ export const useTermsStore = create<TermsStore>((set) => ({
     addTerm: (term) => set((state) => ({ terms: [...state.terms, term] })),
     removeTerm: (term) =>
         set((state) => ({
-            terms: state.terms.filter((t) => t.id !== term.id),
+            terms: state.terms.filter((t) => t._id !== term._id),
             selectedTerm: state.selectedTerm === term ? null : state.selectedTerm,
         })),
     initTerms: (terms) => set({ terms }),
     addCourseToTerm: (term, course) => {
         set((state) => ({
             terms: state.terms.map((t) => {
-                if (t.id === term.id) {
+                if (t._id === term._id) {
                     return {
                         ...t,
                         courses: [...t.courses, course],
@@ -39,7 +39,7 @@ export const useTermsStore = create<TermsStore>((set) => ({
     removeCourseFromTerm: (term, course) => {
         set((state) => ({
             terms: state.terms.map((t) => {
-                if (t.id === term.id) {
+                if (t._id === term._id) {
                     return {
                         ...t,
                         courses: t.courses.filter((c) => c.course_number !== course.course_number),
