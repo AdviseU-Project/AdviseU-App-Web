@@ -70,25 +70,6 @@ const updatePlan = async (
     return result.modifiedCount === 1;
 };
 
-// Delete an existing plan for a user
-const deletePlan = async (planId: string, userId: string): Promise<boolean> => {
-    const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
-
-    const result = await users.updateOne(
-        { _id: new ObjectId(userId) },
-        {
-            $pull: {
-                'extension.plans': {
-                    _id: new ObjectId(planId),
-                },
-            },
-        }
-    );
-
-    return result.modifiedCount === 1;
-};
-
 // PUT request handler - Update a plan
 export async function PUT(req: Request) {
     try {
@@ -116,16 +97,34 @@ export async function PUT(req: Request) {
 
         return NextResponse.json({ success: status });
     } catch (error) {
-        console.error('PUT Error:', error);
-        return NextResponse.json({ error: 'Failed to update plan' }, { status: 500 });
+        console.error('POST Error:', error);
+        return NextResponse.json({ error: 'Failed to create plan' }, { status: 500 });
     }
 }
+
+// Delete an existing plan for a user
+const deletePlan = async (planId: string, userId: string): Promise<boolean> => {
+    const db = client.db('test');
+    const users: Collection<UserDocument> = db.collection('users');
+
+    const result = await users.updateOne(
+        { _id: new ObjectId(userId) },
+        {
+            $pull: {
+                'extension.plans': {
+                    _id: new ObjectId(planId),
+                },
+            },
+        }
+    );
+
+    return result.modifiedCount === 1;
+};
 
 // DELETE request handler - Delete a plan
 export async function DELETE(request: Request, { params }: { params: Promise<{ planId: string }> }) {
     try {
         const planId = (await params).planId;
-        console.log(planId);
 
         const session = await auth();
         if (!session?.user?.id) {
@@ -133,7 +132,11 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ p
         }
 
         const status = await deletePlan(planId, session.user.id);
-        console.log('Status', status);
+
+        if (!status) {
+            return NextResponse.json({ error: 'Failed to delete plan' }, { status: 500 });
+        }
+
         return NextResponse.json({ success: status });
     } catch (error) {
         console.error('DELETE Error:', error);
