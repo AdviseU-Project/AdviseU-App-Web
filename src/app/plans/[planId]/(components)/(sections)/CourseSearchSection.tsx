@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import CourseCard from '@/components/CourseCard';
-import { usePropStore, useTermsStore } from '@/app/store';
+import { useTermsStore } from '@/app/store';
 import { Course } from '@/lib/types';
 import { X } from 'lucide-react';
 import { useFetchCourses } from '@/hooks/queries/useFetchCourses';
@@ -17,7 +17,7 @@ interface CourseSearchSectionProps {
 }
 
 const CourseSearchSection: React.FC<CourseSearchSectionProps> = ({ planId }) => {
-    const { selectedTerm } = useTermsStore();
+    const { selectedTerm, selectTerm } = useTermsStore();
     const [search, setSearch] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const { data, isLoading, isFetching } = useFetchCourses(searchQuery);
@@ -51,6 +51,7 @@ const CourseSearchSection: React.FC<CourseSearchSectionProps> = ({ planId }) => 
 
             // Reset search form fields
             setSelectedCourse(null);
+            selectTerm(null);
         }
     };
 
