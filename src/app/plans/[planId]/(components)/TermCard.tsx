@@ -1,23 +1,26 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import CourseCard from '@/components/CourseCard';
 import { useTermsStore } from '@/app/store';
 import { X, MousePointerClick } from 'lucide-react';
 import { Term } from '@/lib/types';
 import TooltipWrapper from '@/components/TooltipWrapper';
+import { useDeleteTerm } from '@/hooks/mutations/terms';
 
 interface TermProps {
     term: Term;
+    planId: string;
 }
 
-const TermCard: React.FC<TermProps> = ({ term }) => {
-    const { removeTerm, selectTerm, selectedTerm } = useTermsStore();
+const TermCard: React.FC<TermProps> = ({ term, planId }) => {
+    const { selectTerm, selectedTerm } = useTermsStore();
+    const { mutate } = useDeleteTerm();
 
     const handleDeleteTerm = (term: Term) => {
-        removeTerm(term);
+        mutate({ termId: term._id, planId });
 
         if (selectedTerm === term) {
             selectTerm(null);
@@ -64,7 +67,7 @@ const TermCard: React.FC<TermProps> = ({ term }) => {
                     </TooltipWrapper>
                 </div>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 min-h-72">
                 <AnimatePresence>
                     {term.courses.map((course, courseIndex) => (
                         <motion.div
@@ -74,9 +77,21 @@ const TermCard: React.FC<TermProps> = ({ term }) => {
                             exit={{ x: 50, opacity: 0 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <CourseCard course={course} courseIndex={courseIndex} term={term} displayOptions />
+                            <CourseCard
+                                planId={planId}
+                                course={course}
+                                courseIndex={courseIndex}
+                                term={term}
+                                displayOptions
+                            />
                         </motion.div>
                     ))}
+                    {term.courses.length === 0 && (
+                        <div className="flex flex-col items-center gap-12 mt-8">
+                            <img src="/images/education.svg" alt="Clipboard" width={150} height={150} />
+                            <p className="text-gray-600 text-sm">No courses added yet...</p>
+                        </div>
+                    )}
                 </AnimatePresence>
             </div>
         </motion.div>
