@@ -48,16 +48,40 @@ export type NewPlan = {
     terms?: Term[];
 };
 
+type Option = {
+    courses: string[];
+};
+
+type Series = {
+    options: Option[];
+};
+
+export type Requirement = {
+    amount: string;
+    series: Series[];
+};
+
+export type Degree = {
+    program_name: string;
+    program_code: string;
+    description: string;
+    version: number;
+    options: string[];
+    offered_locations: string[];
+    requirements: Requirement[];
+};
+
 /* To be adjusted based on future user preference options */
 export type Preferences = {
     likes_outdoors: number;
 };
 
 export type ProfileExtension = {
-    majors: string[];
-    concentrations: string[];
-    minors: string[];
+    majors: Degree[];
+    concentrations: Degree[];
+    minors: Degree[];
     user_preferences: Preferences;
+    courses_taken: Course[];
     plans: Plan[];
 };
 
@@ -66,6 +90,7 @@ export const defaultExtension: ProfileExtension = {
     concentrations: [],
     minors: [],
     user_preferences: { likes_outdoors: 0 },
+    courses_taken: [],
     plans: [],
 };
 
