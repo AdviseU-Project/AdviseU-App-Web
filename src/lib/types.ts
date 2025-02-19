@@ -77,18 +77,14 @@ export type Preferences = {
 };
 
 export type ProfileExtension = {
-    majors: Degree[];
-    concentrations: Degree[];
-    minors: Degree[];
+    degrees: Degree[];
     user_preferences: Preferences;
     courses_taken: Course[];
     plans: Plan[];
 };
 
 export const defaultExtension: ProfileExtension = {
-    majors: [],
-    concentrations: [],
-    minors: [],
+    degrees: [],
     user_preferences: { likes_outdoors: 0 },
     courses_taken: [],
     plans: [],
