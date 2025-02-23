@@ -28,9 +28,9 @@ const Navbar: React.FC = async () => {
                     <Link className="transition-colors hover:text-foreground/80 text-foreground/60" href="/plans">
                         Your Plans
                     </Link>
-                    {/* <Link className="transition-colors hover:text-foreground/80 text-foreground/60" href="/profile">
+                    <Link className="transition-colors hover:text-foreground/80 text-foreground/60" href="/profile">
                         Profile
-                    </Link> */}
+                    </Link>
                 </nav>
             </div>
 
