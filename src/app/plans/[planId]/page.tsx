@@ -11,7 +11,7 @@ const Page = async ({ params, searchParams }: { params: Params; searchParams: Se
     const session = await auth();
 
     if (!session?.user) {
-        return <SessionNotFound />;
+        return <SessionNotFound message="to create or see your degree plans" />;
     }
 
     return (

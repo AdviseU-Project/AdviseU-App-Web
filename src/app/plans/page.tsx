@@ -10,7 +10,7 @@ export default async function PlansPage() {
     const session = await auth();
 
     if (!session?.user) {
-        return <SessionNotFound />;
+        return <SessionNotFound message="to create or see your degree plans" />;
     }
 
     return (
