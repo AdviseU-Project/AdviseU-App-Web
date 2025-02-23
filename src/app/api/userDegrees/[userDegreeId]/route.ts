@@ -14,7 +14,7 @@ interface UserDocument {
 }
 
 // Update an existing degree for a user
-const updateDegree = async (degree: Degree, userId: string): Promise<boolean> => {
+const updateUserDegree = async (degree: Degree, userId: string): Promise<boolean> => {
     const db = client.db('test');
     const users: Collection<UserDocument> = db.collection('users');
 
@@ -27,7 +27,7 @@ const updateDegree = async (degree: Degree, userId: string): Promise<boolean> =>
 };
 
 // Delete a degree from a user's profile
-const deleteDegree = async (degreeId: string, userId: string): Promise<boolean> => {
+const deleteUserDegree = async (degreeId: string, userId: string): Promise<boolean> => {
     const db = client.db('test');
     const users: Collection<UserDocument> = db.collection('users');
 
@@ -39,7 +39,7 @@ const deleteDegree = async (degreeId: string, userId: string): Promise<boolean> 
     return result.modifiedCount === 1;
 };
 
-// PUT request handler - Update a degree
+// PUT request handler - Update a user's degree
 export async function PUT(req: Request) {
     try {
         const session = await auth();
@@ -52,7 +52,7 @@ export async function PUT(req: Request) {
             return NextResponse.json({ error: 'Degree data is required' }, { status: 400 });
         }
 
-        const status = await updateDegree(body.degree, session.user.id);
+        const status = await updateUserDegree(body.degree, session.user.id);
 
         return NextResponse.json({ success: status });
     } catch (error) {
@@ -61,7 +61,7 @@ export async function PUT(req: Request) {
     }
 }
 
-// DELETE request handler - Remove a degree
+// DELETE request handler - Remove a degree from a user
 export async function DELETE(request: Request, { params }: { params: Promise<{ degreeId: string }> }) {
     try {
         const degreeId = (await params).degreeId;
@@ -72,7 +72,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ d
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const status = await deleteDegree(degreeId, session.user.id);
+        const status = await deleteUserDegree(degreeId, session.user.id);
 
         return NextResponse.json({ success: status });
     } catch (error) {
