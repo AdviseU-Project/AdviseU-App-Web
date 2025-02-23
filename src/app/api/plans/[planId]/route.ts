@@ -38,28 +38,6 @@ const updatePlan = async (plan: Plan, userId: string): Promise<boolean> => {
     return result.modifiedCount === 1;
 };
 
-// PUT request handler - Update a plan
-export async function PUT(req: Request) {
-    try {
-        const session = await auth();
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        const body = await req.json();
-        if (!body.plan) {
-            return NextResponse.json({ error: 'Plan data is required' }, { status: 400 });
-        }
-
-        const status = await updatePlan(body.plan, session.user.id);
-        console.log(status);
-        return NextResponse.json({ success: status });
-    } catch (error) {
-        console.error('POST Error:', error);
-        return NextResponse.json({ error: 'Failed to create plan' }, { status: 500 });
-    }
-}
-
 // Delete an existing plan for a user
 const deletePlan = async (planId: string, userId: string): Promise<boolean> => {
     const db = client.db('test');
@@ -79,6 +57,28 @@ const deletePlan = async (planId: string, userId: string): Promise<boolean> => {
     return result.modifiedCount === 1;
 };
 
+// PUT request handler - Update a plan
+export async function PUT(req: Request) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const body = await req.json();
+        if (!body.plan) {
+            return NextResponse.json({ error: 'Plan data is required' }, { status: 400 });
+        }
+
+        const status = await updatePlan(body.plan, session.user.id);
+        console.log(status);
+        return NextResponse.json({ success: status });
+    } catch (error) {
+        console.error('PUT Error:', error);
+        return NextResponse.json({ error: 'Failed to update plan' }, { status: 500 });
+    }
+}
+
 // DELETE request handler - Delete a plan
 export async function DELETE(request: Request, { params }: { params: Promise<{ planId: string }> }) {
     try {
@@ -94,7 +94,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ p
         console.log('Status', status);
         return NextResponse.json({ success: status });
     } catch (error) {
-        console.error('POST Error:', error);
-        return NextResponse.json({ error: 'Failed to create plan' }, { status: 500 });
+        console.error('DELETE Error:', error);
+        return NextResponse.json({ error: 'Failed to delete plan' }, { status: 500 });
     }
 }
