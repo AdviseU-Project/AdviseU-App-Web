@@ -6,7 +6,7 @@ import { getSession } from 'next-auth/react';
 export const useCreatePlan = () => {
     return useMutation({
         mutationKey: ['plans'],
-        mutationFn: (plan: NewPlan) => createPlan(plan),
+        mutationFn: (plan: NewPlan, generate: boolean = false) => createPlan(plan, generate),
         onSuccess: (_, plan) => {
             toast({
                 title: `Plan Created: ${plan.name}`,
@@ -25,10 +25,10 @@ export const useCreatePlan = () => {
     });
 };
 
-const createPlan = async (plan: NewPlan) => {
+const createPlan = async (plan: NewPlan, generate: boolean) => {
     const response = await fetch(`/api/plans`, {
         method: 'POST',
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, generatePlan: generate }),
         headers: {
             'Content-Type': 'application/json',
         },
@@ -40,7 +40,7 @@ const createPlan = async (plan: NewPlan) => {
 export const useUpdatePlan = () => {
     return useMutation({
         mutationKey: ['plans'],
-        mutationFn: (plan: Plan) => updatePlan(plan),
+        mutationFn: (plan: Plan, generate: boolean = false) => updatePlan(plan, generate),
         onSuccess: (_, plan) => {
             toast({
                 title: `Plan Updated: ${plan?.name}`,
@@ -59,12 +59,12 @@ export const useUpdatePlan = () => {
     });
 };
 
-const updatePlan = async (plan: Plan | null) => {
+const updatePlan = async (plan: Plan, generate: boolean) => {
     if (!plan) return;
 
     const response = await fetch(`/api/plans/${plan._id}`, {
         method: 'PUT',
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, generatePlan: generate }),
         headers: {
             'Content-Type': 'application/json',
         },

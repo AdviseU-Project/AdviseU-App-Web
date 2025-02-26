@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { NewPlan, Plan } from '@/lib/types';
+import { NewPlan, Plan, Course, Degree } from '@/lib/types';
 import client from '@/lib/mongodb';
 import { auth } from '@/lib/auth';
 import { Collection, ObjectId } from 'mongodb';
@@ -24,11 +24,45 @@ const fetchPlans = async (userId: string): Promise<Plan[]> => {
 };
 
 // Create a new plan for a user
-const createPlan = async (plan: NewPlan, userId: string): Promise<boolean> => {
+const createPlan = async (
+    plan: NewPlan,
+    generatePlan: boolean,
+    userId: string,
+    coursesTaken: Course[],
+    degreesTaking: Degree[]
+): Promise<boolean> => {
     const db = client.db('test');
     const users: Collection<UserDocument> = db.collection('users');
 
-    const newPlan = { ...plan, _id: new ObjectId() }; // Add an ObjectId to the plan
+    // Default to provided plan
+    let newPlan = { ...plan, _id: new ObjectId() };
+
+    // Optionally generate plan using backend scheduling algorithm
+    if (generatePlan) {
+        try {
+            const backendUrl = process.env.BACKEND_API_URL;
+            if (!backendUrl) {
+                throw new Error('BACKEND_API_URL is not defined');
+            }
+
+            const response = await fetch(`${backendUrl}/api/generatePlan`, {
+                method: 'POST',
+                body: JSON.stringify({ userId, newPlan, coursesTaken, degreesTaking }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to generate plan from external backend');
+            }
+
+            newPlan = await response.json(); // Use the generated plan
+        } catch (error) {
+            console.error('Error generating plan:', error);
+            return false; // Fail gracefully
+        }
+    }
 
     const result = await users.updateOne({ _id: new ObjectId(userId) }, { $push: { 'extension.plans': newPlan } });
 
@@ -64,7 +98,13 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Plan data is required' }, { status: 400 });
         }
 
-        const status = await createPlan(body.plan, session.user.id);
+        const status = await createPlan(
+            body.plan,
+            body.generatePlan,
+            session.user.id,
+            session.user.extension.courses_taken,
+            session.user.extension.degrees
+        );
         return NextResponse.json({ success: status });
     } catch (error) {
         console.error('POST Error:', error);

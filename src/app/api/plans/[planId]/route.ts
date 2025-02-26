@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Plan } from '@/lib/types';
+import { Plan, Course, Degree } from '@/lib/types';
 import client from '@/lib/mongodb';
 import { auth } from '@/lib/auth';
 import { Collection, ObjectId } from 'mongodb';
@@ -14,11 +14,43 @@ interface UserDocument {
 }
 
 // Update an existing plan for a user
-const updatePlan = async (plan: Plan, userId: string): Promise<boolean> => {
+const updatePlan = async (
+    plan: Plan,
+    generatePlan: boolean,
+    userId: string,
+    coursesTaken: Course[],
+    degreesTaking: Degree[]
+): Promise<boolean> => {
     const db = client.db('test');
     const users: Collection<UserDocument> = db.collection('users');
 
-    console.log(plan);
+    // Optionally generate plan using backend scheduling algorithm
+    if (generatePlan) {
+        try {
+            const backendUrl = process.env.BACKEND_API_URL;
+            if (!backendUrl) {
+                throw new Error('BACKEND_API_URL is not defined');
+            }
+
+            const response = await fetch(`${backendUrl}/api/generatePlan`, {
+                method: 'POST',
+                body: JSON.stringify({ userId, plan, coursesTaken, degreesTaking }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to generate plan from external backend');
+            }
+
+            plan = await response.json(); // Use the generated plan
+        } catch (error) {
+            console.error('Error generating plan:', error);
+            return false; // Fail gracefully
+        }
+    }
+
     const planId = new ObjectId(plan._id);
 
     const result = await users.updateOne(
@@ -70,7 +102,13 @@ export async function PUT(req: Request) {
             return NextResponse.json({ error: 'Plan data is required' }, { status: 400 });
         }
 
-        const status = await updatePlan(body.plan, session.user.id);
+        const status = await updatePlan(
+            body.plan,
+            body.generatePlan,
+            session.user.id,
+            session.user.extension.courses_taken,
+            session.user.extension.degrees
+        );
         console.log(status);
         return NextResponse.json({ success: status });
     } catch (error) {
