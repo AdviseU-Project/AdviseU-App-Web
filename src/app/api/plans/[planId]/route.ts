@@ -109,7 +109,11 @@ export async function PUT(req: Request) {
             session.user.extension.courses_taken,
             session.user.extension.degrees
         );
-        console.log(status);
+
+        if (!status) {
+            throw new Error('Failed to update plan');
+        }
+
         return NextResponse.json({ success: status });
     } catch (error) {
         console.error('PUT Error:', error);

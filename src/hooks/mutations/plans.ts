@@ -6,10 +6,10 @@ import { getSession } from 'next-auth/react';
 export const useCreatePlan = () => {
     return useMutation({
         mutationKey: ['plans'],
-        mutationFn: (plan: NewPlan, generate: boolean = false) => createPlan(plan, generate),
-        onSuccess: (_, plan) => {
+        mutationFn: ({ plan, generate }: { plan: NewPlan; generate?: boolean }) => createPlan(plan, generate ?? false),
+        onSuccess: (_, variables) => {
             toast({
-                title: `Plan Created: ${plan.name}`,
+                title: `Plan Created: ${variables.plan.name}`,
                 description: 'Your plan has been created successfully.',
             });
 
@@ -33,6 +33,13 @@ const createPlan = async (plan: NewPlan, generate: boolean) => {
             'Content-Type': 'application/json',
         },
     });
+
+    // Check if response is not OK (e.g., 500 error)
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create plan');
+    }
+
     const data = await response.json();
     return data;
 };
@@ -40,10 +47,10 @@ const createPlan = async (plan: NewPlan, generate: boolean) => {
 export const useUpdatePlan = () => {
     return useMutation({
         mutationKey: ['plans'],
-        mutationFn: (plan: Plan, generate: boolean = false) => updatePlan(plan, generate),
-        onSuccess: (_, plan) => {
+        mutationFn: ({ plan, generate }: { plan: Plan; generate?: boolean }) => updatePlan(plan, generate ?? false),
+        onSuccess: (_, variables) => {
             toast({
-                title: `Plan Updated: ${plan?.name}`,
+                title: `Plan Updated: ${variables.plan?.name}`,
                 description: 'Your plan has been updated successfully.',
             });
 
@@ -69,6 +76,13 @@ const updatePlan = async (plan: Plan, generate: boolean) => {
             'Content-Type': 'application/json',
         },
     });
+
+    // Check if response is not OK (e.g., 500 error)
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create plan');
+    }
+
     const data = await response.json();
     return data;
 };

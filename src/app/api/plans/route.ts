@@ -105,6 +105,11 @@ export async function POST(req: Request) {
             session.user.extension.courses_taken,
             session.user.extension.degrees
         );
+
+        if (!status) {
+            throw new Error('Failed to create plan');
+        }
+
         return NextResponse.json({ success: status });
     } catch (error) {
         console.error('POST Error:', error);
