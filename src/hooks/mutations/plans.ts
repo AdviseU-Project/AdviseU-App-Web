@@ -6,10 +6,10 @@ import { getSession } from 'next-auth/react';
 export const useCreatePlan = () => {
     return useMutation({
         mutationKey: ['plans'],
-        mutationFn: (plan: NewPlan) => createPlan(plan),
-        onSuccess: (_, plan) => {
+        mutationFn: ({ plan, generate }: { plan: NewPlan; generate?: boolean }) => createPlan(plan, generate ?? false),
+        onSuccess: (_, variables) => {
             toast({
-                title: `Plan Created: ${plan.name}`,
+                title: `Plan Created: ${variables.plan.name}`,
                 description: 'Your plan has been created successfully.',
             });
 
@@ -25,14 +25,21 @@ export const useCreatePlan = () => {
     });
 };
 
-const createPlan = async (plan: NewPlan) => {
+const createPlan = async (plan: NewPlan, generate: boolean) => {
     const response = await fetch(`/api/plans`, {
         method: 'POST',
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, generatePlan: generate }),
         headers: {
             'Content-Type': 'application/json',
         },
     });
+
+    // Check if response is not OK (e.g., 500 error)
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create plan');
+    }
+
     const data = await response.json();
     return data;
 };
@@ -40,10 +47,10 @@ const createPlan = async (plan: NewPlan) => {
 export const useUpdatePlan = () => {
     return useMutation({
         mutationKey: ['plans'],
-        mutationFn: (plan: Plan) => updatePlan(plan),
-        onSuccess: (_, plan) => {
+        mutationFn: ({ plan, generate }: { plan: Plan; generate?: boolean }) => updatePlan(plan, generate ?? false),
+        onSuccess: (_, variables) => {
             toast({
-                title: `Plan Updated: ${plan?.name}`,
+                title: `Plan Updated: ${variables.plan?.name}`,
                 description: 'Your plan has been updated successfully.',
             });
 
@@ -59,16 +66,23 @@ export const useUpdatePlan = () => {
     });
 };
 
-const updatePlan = async (plan: Plan | null) => {
+const updatePlan = async (plan: Plan, generate: boolean) => {
     if (!plan) return;
 
     const response = await fetch(`/api/plans/${plan._id}`, {
         method: 'PUT',
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, generatePlan: generate }),
         headers: {
             'Content-Type': 'application/json',
         },
     });
+
+    // Check if response is not OK (e.g., 500 error)
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create plan');
+    }
+
     const data = await response.json();
     return data;
 };
