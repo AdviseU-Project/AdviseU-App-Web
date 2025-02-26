@@ -15,7 +15,7 @@ const EditPlanModal = () => {
     const handleUpdatePlan = () => {
         if (!editingPlan || editingPlan.name.trim() === '') return;
 
-        mutate(editingPlan);
+        mutate({ plan: editingPlan });
         setEditingPlan(null);
     };
     return (
