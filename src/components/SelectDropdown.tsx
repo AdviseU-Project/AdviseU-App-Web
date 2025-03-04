@@ -12,12 +12,13 @@ interface SelectDropdownProps {
     placeholder?: string;
     label?: string;
     options: string[];
-    onChange: (value: string) => void;
+    onValueChange: (value: string) => void;
+    value: string;
 }
 
-export function SelectDropdown({ placeholder, label, options, onChange }: SelectDropdownProps) {
+export function SelectDropdown({ placeholder, label, options, onValueChange, value }: SelectDropdownProps) {
     return (
-        <Select onValueChange={onChange}>
+        <Select onValueChange={onValueChange} value={value}>
             <SelectTrigger className="w-[55%]">
                 <SelectValue placeholder={placeholder ?? 'Select an option'} />
             </SelectTrigger>

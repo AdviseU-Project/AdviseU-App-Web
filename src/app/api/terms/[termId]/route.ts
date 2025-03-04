@@ -41,7 +41,7 @@ const updatePlan = async (term: Term, userId: string, planId: string): Promise<b
     return result.modifiedCount === 1;
 };
 
-export async function PUT(req: Request, { params }: { params: { termId: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const session = await auth();
         if (!session?.user?.id) {
