@@ -16,13 +16,13 @@ const PlanOverviewSection = ({ planId }: { planId: string }) => {
         <div className="w-full overflow-x-auto flex flex-col bg-white/80 backdrop-blur-sm shadow-xl rounded-xl">
             <div className="flex justify-between items-center px-10 py-4">
                 <h1 className="text-xl font-bold">Plan Overview</h1>
-                <AddTermDialog planId={planId} />
+                <AddTermDialog planId={planId} variant="outline" />
             </div>
             <hr className="w-full border-gray-300" />
             <motion.div
                 className="flex justify-center items-center gap-3 min-h-72 p-8"
                 animate={controls}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                transition={{ type: 'spring', stiffness: 100, damping: 30 }}
             >
                 <AnimatePresence>
                     {terms?.length ? (

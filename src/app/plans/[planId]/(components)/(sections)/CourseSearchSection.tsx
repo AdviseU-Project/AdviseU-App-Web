@@ -20,9 +20,11 @@ const CourseSearchSection: React.FC<CourseSearchSectionProps> = ({ planId }) => 
     const { selectedTerm, selectTerm } = useTermsStore();
     const [search, setSearch] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
-    const { data, isLoading, isFetching } = useFetchCourses(searchQuery);
+    const { data, isLoading } = useFetchCourses(searchQuery);
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
     const { mutate } = useUpdateTerm();
+
+    const selectedCourseInTerm = selectedTerm?.courses?.some((course) => course._id === selectedCourse?._id);
 
     const handleCancelSearch = () => {
         setSearch('');
@@ -44,7 +46,7 @@ const CourseSearchSection: React.FC<CourseSearchSectionProps> = ({ planId }) => 
             mutate({
                 term: {
                     ...selectedTerm,
-                    courses: [...selectedTerm.courses, selectedCourse],
+                    courses: [...(selectedTerm?.courses || []), selectedCourse] as Course[],
                 },
                 planId: planId,
             });
@@ -53,6 +55,7 @@ const CourseSearchSection: React.FC<CourseSearchSectionProps> = ({ planId }) => 
             setSelectedCourse(null);
             selectTerm(null);
         }
+        selectTerm(null);
     };
 
     const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,9 +124,16 @@ const CourseSearchSection: React.FC<CourseSearchSectionProps> = ({ planId }) => 
 
                     {search && selectedCourse && (
                         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-                            <Button onClick={handleAddCourse} disabled={!selectedTerm || !selectedCourse}>
+                            <Button
+                                onClick={handleAddCourse}
+                                disabled={!selectedTerm || !selectedCourse || selectedCourseInTerm}
+                            >
                                 Add {selectedCourse.course_number} to{' '}
-                                {selectedTerm ? selectedTerm.name : '<No Term Selected>'}
+                                {selectedCourseInTerm
+                                    ? '(Course Already In Term)'
+                                    : selectedTerm
+                                    ? selectedTerm.name
+                                    : '(No Term Selected)'}
                             </Button>
                         </motion.div>
                     )}

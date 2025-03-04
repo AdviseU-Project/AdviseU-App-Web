@@ -6,7 +6,7 @@ export type Term = NewTerm & {
 
 export type NewTerm = {
     name: string;
-    courses: Course[];
+    courses?: Course[];
 };
 
 export type Course = {

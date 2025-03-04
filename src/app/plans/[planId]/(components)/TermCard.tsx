@@ -69,7 +69,7 @@ const TermCard: React.FC<TermProps> = ({ term, planId }) => {
             </div>
             <div className="flex flex-col gap-2 min-h-72">
                 <AnimatePresence>
-                    {term.courses.map((course, courseIndex) => (
+                    {term.courses?.map((course, courseIndex) => (
                         <motion.div
                             key={courseIndex}
                             initial={{ x: -50, opacity: 1 }}
@@ -86,7 +86,7 @@ const TermCard: React.FC<TermProps> = ({ term, planId }) => {
                             />
                         </motion.div>
                     ))}
-                    {term.courses.length === 0 && (
+                    {term.courses?.length === 0 && (
                         <div className="flex flex-col items-center gap-12 mt-8">
                             <img src="/images/education.svg" alt="Clipboard" width={150} height={150} />
                             <p className="text-gray-600 text-sm">No courses added yet...</p>
