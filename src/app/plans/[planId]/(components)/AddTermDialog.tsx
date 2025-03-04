@@ -15,7 +15,7 @@ import { Plus } from 'lucide-react';
 import { useCreateTerm } from '@/hooks/mutations/terms';
 import { useSession } from 'next-auth/react';
 
-interface AddTermButtonProps {
+interface AddTermDialogProps {
     variant?: ButtonProps['variant'];
     planId: string;
 }
@@ -26,11 +26,32 @@ const FormSchema = z.object({
     }),
 });
 
-const AddTermButton: React.FC<AddTermButtonProps> = ({ variant, planId }) => {
+const AddTermDialog: React.FC<AddTermDialogProps> = ({ variant, planId }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [term, setTerm] = useState<string | null>(null);
     const { mutate } = useCreateTerm();
     const { data } = useSession();
+
+    const form = useForm<z.infer<typeof FormSchema>>({
+        resolver: zodResolver(FormSchema),
+        defaultValues: {
+            term: 'Select a Term',
+        },
+    });
+
+    function onSubmit(data: z.infer<typeof FormSchema>) {
+        if (!data.term) return;
+
+        mutate({
+            term: { name: data.term, courses: [] },
+            planId: planId,
+        });
+
+        form.reset({
+            term: 'Select a Term',
+        });
+
+        handleClose();
+    }
 
     const availableTerms = [
         'Fall 2024',
@@ -52,30 +73,6 @@ const AddTermButton: React.FC<AddTermButtonProps> = ({ variant, planId }) => {
 
     const handleOpen = () => setIsOpen(true);
     const handleClose = () => setIsOpen(false);
-    const handleAddTerm = () => {
-        if (!term) return;
-
-        mutate({
-            term: { name: term, courses: [] },
-            planId: planId,
-        });
-        handleClose();
-    };
-
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
-    });
-
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        toast({
-            title: 'You submitted the following values:',
-            description: (
-                <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-                    <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-                </pre>
-            ),
-        });
-    }
 
     return (
         <>
@@ -92,7 +89,7 @@ const AddTermButton: React.FC<AddTermButtonProps> = ({ variant, planId }) => {
                             <FormField
                                 control={form.control}
                                 name="term"
-                                render={() => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <DialogTitle asChild>
                                             <FormLabel>Add Term</FormLabel>
@@ -101,7 +98,8 @@ const AddTermButton: React.FC<AddTermButtonProps> = ({ variant, planId }) => {
                                             placeholder="Select a Term"
                                             label="Select Term"
                                             options={availableTerms}
-                                            onChange={setTerm}
+                                            value={field.value}
+                                            onValueChange={field.onChange}
                                         />
                                         <FormDescription>Select the term you would like to add</FormDescription>
                                         <FormMessage>{form.formState.errors.term?.message}</FormMessage>
@@ -109,9 +107,7 @@ const AddTermButton: React.FC<AddTermButtonProps> = ({ variant, planId }) => {
                                 )}
                             />
 
-                            <Button type="submit" onClick={handleAddTerm}>
-                                Confirm
-                            </Button>
+                            <Button type="submit">Confirm</Button>
                         </form>
                     </Form>
                 </DialogContent>
@@ -120,4 +116,4 @@ const AddTermButton: React.FC<AddTermButtonProps> = ({ variant, planId }) => {
     );
 };
 
-export default AddTermButton;
+export default AddTermDialog;

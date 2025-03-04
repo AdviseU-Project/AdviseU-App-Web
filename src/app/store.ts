@@ -29,7 +29,7 @@ export const useTermsStore = create<TermsStore>((set) => ({
                 if (t._id === term._id) {
                     return {
                         ...t,
-                        courses: [...t.courses, course],
+                        courses: [...(t?.courses || []), course],
                     };
                 }
                 return t;
@@ -42,7 +42,7 @@ export const useTermsStore = create<TermsStore>((set) => ({
                 if (t._id === term._id) {
                     return {
                         ...t,
-                        courses: t.courses.filter((c) => c.course_number !== course.course_number),
+                        courses: t?.courses?.filter((c) => c.course_number !== course.course_number),
                     };
                 }
                 return t;

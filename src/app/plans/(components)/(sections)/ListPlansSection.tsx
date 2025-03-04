@@ -18,7 +18,7 @@ const ListPlansSection: React.FC = () => {
     return (
         <AnimatePresence>
             <div className="grid gap-6 md:grid-cols-2">
-                {!data?.user.extension.plans.length && <h1>No Plans Yet...</h1>}
+                {!data?.user?.extension?.plans?.length && <h1>No Plans Yet...</h1>}{' '}
                 {data?.user.extension.plans.map((plan: Plan) => (
                     <motion.div
                         key={plan._id}

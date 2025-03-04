@@ -1,9 +1,9 @@
 import { Params, SearchParams } from '@/lib/types';
 import { Card } from '@/components/ui/card';
+import { auth } from '@/lib/auth';
 
 import CourseSearchSection from './(components)/(sections)/CourseSearchSection';
 import PlanOverviewSection from './(components)/(sections)/PlanOverviewSection';
-import { auth } from '@/lib/auth';
 import SessionNotFound from '@/components/SessionNotFound';
 
 const Page = async ({ params, searchParams }: { params: Params; searchParams: SearchParams }) => {

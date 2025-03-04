@@ -8,7 +8,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Course, Term } from '@/lib/types';
 import { EllipsisVertical } from 'lucide-react';
-import { usePropStore, useTermsStore } from '@/app/store';
 import { useUpdateTerm } from '@/hooks/mutations/terms';
 
 interface CourseCardProps {
@@ -30,7 +29,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
     selectable,
     onClick,
     displayOptions,
-    planId
+    planId,
 }) => {
     if (!onClick) {
         onClick = () => {};
@@ -44,7 +43,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         mutate({
             term: {
                 ...term,
-                courses: term.courses.filter((c) => c.course_number !== course.course_number),
+                courses: term.courses?.filter((c) => c.course_number !== course.course_number),
             },
             planId: planId,
         });
@@ -61,7 +60,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
             {/* Course Info */}
             <div>
                 <div className="text-sm font-medium sm:text-md">{course.course_number}</div>
-                <div className="text-xs text-muted-foreground line-clamp-1 sm:text-sm">{course.course_name}</div>
+                <div className="text-xs text-muted-foreground line-clamp-1 sm:text-xs">{course.course_name}</div>
             </div>
 
             {/* Options */}

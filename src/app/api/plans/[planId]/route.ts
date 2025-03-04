@@ -41,7 +41,7 @@ const updatePlan = async (
             });
 
             if (!response.ok) {
-                throw new Error('Failed to generate plan from external backend');
+                throw new Error('Failed to generate plan from external backend')
             }
 
             plan = await response.json(); // Use the generated plan
