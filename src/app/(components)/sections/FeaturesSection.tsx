@@ -1,44 +1,59 @@
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Calendar, BookOpen, TrendingUp } from 'lucide-react';
+'use client';
 
-const features = [
-    {
-        icon: Calendar,
-        title: 'Smart Scheduling',
-        description: 'Automatically generate conflict-free schedules based on your preferences and requirements.',
-    },
-    {
-        icon: BookOpen,
-        title: 'Course Tracking',
-        description: 'Keep track of completed courses, credits, and remaining requirements for your degree.',
-    },
-    {
-        icon: TrendingUp,
-        title: 'Progress Insights',
-        description: 'Visualize your academic progress and get personalized recommendations for course selection.',
-    },
-];
+import { CalendarCheck, GraduationCap, Brain, CalendarRange, MapPin, Clock } from 'lucide-react';
+import { FeatureCard } from '@/app/(components)/feature-card';
 
-export default function FeaturesSection() {
+const FeaturesSection = () => {
     return (
-        <section className="bg-white">
-            <div className="container mx-auto px-4 py-20">
-                <h2 className="text-3xl font-bold mb-12 text-center text-black">Why Choose AdviseU?</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {features.map((feature, index) => (
-                        <Card
-                            key={index}
-                            className="border border-gray-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-                        >
-                            <CardHeader>
-                                <feature.icon className="w-12 h-12 text-orange-600 mb-4" />
-                                <CardTitle>{feature.title}</CardTitle>
-                                <CardDescription>{feature.description}</CardDescription>
-                            </CardHeader>
-                        </Card>
-                    ))}
+        <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-white">
+            <div className="container mx-auto px-4 md:px-6">
+                <div className="flex flex-col items-center justify-center space-y-4 text-center">
+                    <div className="space-y-2">
+                        <div className="inline-block rounded-lg bg-orange-100 px-3 py-1 text-sm text-orange-600">
+                            Features
+                        </div>
+                        <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Everything You Need</h2>
+                        <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                            AdviseU provides all the tools you need to plan your academic journey and stay on track for
+                            graduation.
+                        </p>
+                    </div>
+                </div>
+                <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8">
+                    <FeatureCard
+                        icon={<CalendarCheck className="h-10 w-10 text-orange-600" />}
+                        title="Course Planning"
+                        description="Search and add courses to your plan with real-time prerequisite checking and term scheduling."
+                    />
+                    <FeatureCard
+                        icon={<GraduationCap className="h-10 w-10 text-orange-600" />}
+                        title="Degree Tracking"
+                        description="Track your progress toward completion of your degree requirements."
+                    />
+                    <FeatureCard
+                        icon={<Brain className="h-10 w-10 text-orange-600" />}
+                        title="AI Recommendations"
+                        description="Get personalized course recommendations based on your academic history and goals."
+                    />
+                    <FeatureCard
+                        icon={<CalendarRange className="h-10 w-10 text-orange-600" />}
+                        title="Multi-term Planning"
+                        description="Plan your entire academic journey across multiple terms and years."
+                    />
+                    <FeatureCard
+                        icon={<MapPin className="h-10 w-10 text-orange-600" />}
+                        title="Graduation Path"
+                        description="Visualize your path to graduation and ensure you're taking the right courses at the right time."
+                    />
+                    <FeatureCard
+                        icon={<Clock className="h-10 w-10 text-orange-600" />}
+                        title="Schedule Generation"
+                        description="Automatically generate optimal course schedules based on your preferences and requirements."
+                    />
                 </div>
             </div>
         </section>
     );
-}
+};
+
+export default FeaturesSection;
