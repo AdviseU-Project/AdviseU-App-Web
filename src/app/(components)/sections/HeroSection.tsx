@@ -7,7 +7,7 @@ import { BackgroundBeams } from '@/components/ui/background-beams';
 
 const HeroSection = () => {
     return (
-        <section className="relative w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-orange-50 via-orange-50 to-white">
+        <section className="relative w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-orange-50 via-orange-50 to-orange-50">
             <div className="container mx-auto px-4 md:px-6 relative z-10">
                 <div className="flex flex-col items-center justify-center text-center max-w-3xl mx-auto">
                     <div className="space-y-4">
