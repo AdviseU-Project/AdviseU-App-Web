@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import Providers from './providers';
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
                     {children}
                 </Providers>
                 <Toaster />
+                <Analytics />
             </body>
         </html>
     );
