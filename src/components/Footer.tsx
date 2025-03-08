@@ -1,4 +1,6 @@
+import { scrolltoHash } from '@/lib/utils';
 import Link from 'next/link';
+import { Button } from './ui/button';
 
 export default function Footer() {
     return (
@@ -15,24 +17,40 @@ export default function Footer() {
                         <h3 className="text-lg font-semibold text-black">Quick Links</h3>
                         <ul className="space-y-2">
                             <li>
-                                <Link href="#" className="hover:text-orange-600">
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => scrolltoHash('home')}
+                                    className="hover:text-orange-600 p-0 m-0 h-min"
+                                >
                                     Home
-                                </Link>
+                                </Button>
                             </li>
                             <li>
-                                <Link href="#" className="hover:text-orange-600">
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => scrolltoHash('features')}
+                                    className="hover:text-orange-600 p-0 m-0 h-min"
+                                >
                                     Features
-                                </Link>
+                                </Button>
                             </li>
                             <li>
-                                <Link href="#" className="hover:text-orange-600">
-                                    About
-                                </Link>
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => scrolltoHash('demo')}
+                                    className="hover:text-orange-600 p-0 m-0 h-min"
+                                >
+                                    View Demo
+                                </Button>
                             </li>
                             <li>
-                                <Link href="#" className="hover:text-orange-600">
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => scrolltoHash('contact')}
+                                    className="hover:text-orange-600 p-0 m-0 h-min"
+                                >
                                     Contact
-                                </Link>
+                                </Button>
                             </li>
                         </ul>
                     </div>
@@ -40,23 +58,8 @@ export default function Footer() {
                         <h3 className="text-lg font-semibold text-black">Connect With Us</h3>
                         <ul className="space-y-2">
                             <li>
-                                <Link href="#" className="hover:text-orange-600">
-                                    Facebook
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="hover:text-orange-600">
-                                    Twitter
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="hover:text-orange-600">
-                                    LinkedIn
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="hover:text-orange-600">
-                                    Instagram
+                                <Link href="https://github.com/AdviseU-Project" className="hover:text-orange-600">
+                                    Github
                                 </Link>
                             </li>
                         </ul>

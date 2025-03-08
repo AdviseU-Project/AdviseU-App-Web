@@ -4,10 +4,14 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { BackgroundBeams } from '@/components/ui/background-beams';
+import { scrolltoHash } from '@/lib/utils';
 
 const HeroSection = () => {
     return (
-        <section className="relative w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-orange-50 via-orange-50 to-orange-50">
+        <section
+            id="home"
+            className="relative w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-orange-50 via-orange-50 to-orange-50"
+        >
             <div className="container mx-auto px-4 md:px-6 relative z-10">
                 <div className="flex flex-col items-center justify-center text-center max-w-3xl mx-auto">
                     <div className="space-y-4">
@@ -25,14 +29,13 @@ const HeroSection = () => {
                                 Get Started
                             </Button>
                         </Link>
-                        <Link href="#features">
-                            <Button
-                                variant="outline"
-                                className="w-full sm:w-auto inline-flex h-12 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950"
-                            >
-                                Learn More
-                            </Button>
-                        </Link>
+                        <Button
+                            variant="outline"
+                            className="w-full sm:w-auto inline-flex h-12 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950"
+                            onClick={() => scrolltoHash('features')}
+                        >
+                            Learn More
+                        </Button>
                     </div>
                 </div>
             </div>

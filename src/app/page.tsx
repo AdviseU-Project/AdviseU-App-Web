@@ -14,8 +14,8 @@ export default function LandingPage() {
             <HeroSection />
             <FeaturesSection />
             <DemoSection />
-            <TestimonialsSection />
-            <PricingSection />
+            {/* <TestimonialsSection /> */}
+            {/* <PricingSection /> */}
             <CTASection />
             <Footer />
         </div>

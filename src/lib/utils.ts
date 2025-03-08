@@ -16,3 +16,9 @@ const formatRequisites = (requisites: string[][]) => {
         return `${formattedGroup}${index < requisites.length - 1 ? ' and ' : ''}`;
     });
 };
+
+// Scrolls to the element with the given ID (must be on same page)
+export const scrolltoHash = function (element_id: string) {
+    const element = document.getElementById(element_id);
+    element?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+};
