@@ -1,84 +1,61 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Course, Term } from '@/lib/types';
-import { EllipsisVertical } from 'lucide-react';
+import { useDraggable } from '@dnd-kit/core';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Trash } from 'lucide-react';
 import { useUpdateTerm } from '@/hooks/mutations/terms';
+import CourseDetailsDialog from '@/app/plans/[planId]/(components)/CourseDetailsDialog';
+import DeleteCourseDialog from '@/app/plans/[planId]/(components)/DeleteCourseDialog';
 
 interface CourseCardProps {
-    term?: Term;
     course: Course;
-    courseIndex?: number;
-    selected?: boolean;
-    selectable?: boolean;
-    onClick?: () => void;
-    displayOptions?: boolean;
+    term?: Term;
+    isDraggable?: boolean;
+    fromSearch?: boolean;
     planId: string;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({
-    term,
-    course,
-    courseIndex,
-    selected,
-    selectable,
-    onClick,
-    displayOptions,
-    planId,
-}) => {
-    if (!onClick) {
-        onClick = () => {};
-    }
-
-    const { mutate } = useUpdateTerm();
-
-    const handleRemoveCourse = (course: Course, term?: Term) => {
-        if (!term || !course) return;
-
-        mutate({
-            term: {
-                ...term,
-                courses: term.courses?.filter((c) => c.course_number !== course.course_number),
-            },
-            planId: planId,
-        });
-    };
-
-    const cardVariants = [
-        'flex items-center justify-between rounded-lg border p-2 shadow-sm bg-white sm:p-3',
-        selected ? 'border-zinc-400 scale-105 bg-zinc-50' : '',
-        selectable ? 'cursor-pointer hover:scale-105 hover:border-zinc-400' : '',
-    ];
+const CourseCard: React.FC<CourseCardProps> = ({ course, term, isDraggable = true, fromSearch = false, planId }) => {
+    // Set up draggable properties
+    const id = fromSearch
+        ? `search-${course._id.toString()}`
+        : term
+        ? `term-${term._id.toString()}-course-${course._id.toString()}`
+        : `course-${course._id.toString()}`;
+    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+        id,
+        data: {
+            course,
+            termId: term?._id.toString(),
+            fromSearch,
+        },
+        disabled: !isDraggable,
+    });
 
     return (
-        <div key={courseIndex} className={`${cardVariants.join(' ')}`} onClick={onClick}>
-            {/* Course Info */}
-            <div>
-                <div className="text-sm font-medium sm:text-md">{course.course_number}</div>
-                <div className="text-xs text-muted-foreground line-clamp-1 sm:text-xs">{course.course_name}</div>
-            </div>
+        <div
+            ref={setNodeRef}
+            {...attributes}
+            {...listeners}
+            className={`min-w-64 max-h-24 p-3 mt-0 rounded-lg border bg-white hover:bg-gray-50 transition-all  `}
+            id={course._id.toString()}
+        >
+            <div className="flex justify-between w-full">
+                <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-900">{course.course_number}</span>
+                    <Badge variant="outline" className="bg-blue-50 text-xs">
+                        {course.credits} cr
+                    </Badge>
+                </div>
+                <div className="flex items-center">
+                    <CourseDetailsDialog course={course} />
 
-            {/* Options */}
-            <div className={displayOptions ? '' : 'hidden'}>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <EllipsisVertical />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleRemoveCourse(course, term)}>
-                            Remove course
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                    {/* Trash Course */}
+                    {term && <DeleteCourseDialog course={course} term={term} planId={planId} />}
+                </div>
             </div>
+            <div className="text-sm line-clamp-2 mt-1 text-gray-700">{course.course_name}</div>
         </div>
     );
 };

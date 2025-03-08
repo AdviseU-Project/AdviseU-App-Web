@@ -10,7 +10,7 @@ import { useCreatePlan } from '@/hooks/mutations/plans';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { planFormSchema } from '@/schemas/planFormSchema';
+import { planFormSchema } from '@/lib/schemas/planFormSchema';
 
 type PlanFormValues = z.infer<typeof planFormSchema>;
 
