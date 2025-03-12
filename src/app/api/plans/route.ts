@@ -58,21 +58,37 @@ const createPlan = async (plan: NewPlan, generatePlan: boolean, userId: string):
             });
 
             if (!response.ok) {
-                console.error('Backend failed to process the plan');
-
-                // Remove the plan we just added
-                await users.updateOne(
-                    { _id: new ObjectId(userId) },
-                    { $pull: { 'extension.plans': { _id: newPlanId } } }
-                );
-
-                return false;
+                console.log('Backend failed to process the plan with status:', response.status);
+                throw new Error('Backend returned an error response');
             }
 
             // Backend will update the plan directly in the database
             // No need to get a response or update the plan again here
         } catch (error) {
-            console.error('Error notifying backend to generate plan:', error);
+            console.error('Error in backend plan generation process:', error);
+
+            // Delete the plan whether it was a fetch failure or a bad response
+            try {
+                const removeResult = await users.updateOne(
+                    { _id: new ObjectId(userId) },
+                    {
+                        $pull: {
+                            'extension.plans': {
+                                _id: newPlanId,
+                            },
+                        },
+                    }
+                );
+
+                if (removeResult.modifiedCount !== 1) {
+                    console.error('Failed to remove the plan after backend processing failure');
+                } else {
+                    console.log('Successfully removed plan after backend failure');
+                }
+            } catch (removeError) {
+                console.error('Error removing plan after backend failure:', removeError);
+            }
+
             return false; // Fail gracefully
         }
     }
