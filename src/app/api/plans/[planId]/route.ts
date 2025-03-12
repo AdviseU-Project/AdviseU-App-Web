@@ -14,46 +14,14 @@ interface UserDocument {
 }
 
 // Update an existing plan for a user
-const updatePlan = async (
-    plan: Plan,
-    generatePlan: boolean,
-    userId: string,
-    coursesTaken: Course[],
-    degreesTaking: Degree[]
-): Promise<boolean> => {
+const updatePlan = async (plan: Plan, generatePlan: boolean, userId: string): Promise<boolean> => {
     const db = client.db('test');
     const users: Collection<UserDocument> = db.collection('users');
 
-    // Optionally generate plan using backend scheduling algorithm
-    if (generatePlan) {
-        try {
-            const backendUrl = process.env.BACKEND_API_URL;
-            if (!backendUrl) {
-                throw new Error('BACKEND_API_URL is not defined');
-            }
-
-            const response = await fetch(`${backendUrl}/api/generatePlan`, {
-                method: 'POST',
-                body: JSON.stringify({ userId, plan, coursesTaken, degreesTaking }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to generate plan from external backend')
-            }
-
-            plan = await response.json(); // Use the generated plan
-        } catch (error) {
-            console.error('Error generating plan:', error);
-            return false; // Fail gracefully
-        }
-    }
-
     const planId = new ObjectId(plan._id);
 
-    const result = await users.updateOne(
+    // First, update the plan in the database
+    const updateResult = await users.updateOne(
         { _id: new ObjectId(userId), 'extension.plans._id': planId },
         {
             $set: {
@@ -67,7 +35,45 @@ const updatePlan = async (
         }
     );
 
-    return result.modifiedCount === 1;
+    // Check if update was successful
+    if (updateResult.modifiedCount !== 1) {
+        return false;
+    }
+
+    // If generate plan is true, notify the backend to modify the plan
+    if (generatePlan) {
+        try {
+            const backendUrl = process.env.BACKEND_API_URL;
+            if (!backendUrl) {
+                throw new Error('BACKEND_API_URL is not defined');
+            }
+
+            // Send the userId and planId to the backend
+            const response = await fetch(`${backendUrl}/api/generatePlan`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    userId: userId,
+                    planId: planId.toString(),
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                console.error('Backend failed to process the plan update');
+                return false;
+            }
+
+            // Backend will update the plan directly in the database
+            // No need to get a response or update the plan again here
+        } catch (error) {
+            console.error('Error notifying backend to update plan:', error);
+            return false; // Fail gracefully
+        }
+    }
+
+    return true;
 };
 
 // PUT request handler - Update a plan
@@ -83,13 +89,7 @@ export async function PUT(req: Request) {
             return NextResponse.json({ error: 'Plan data is required' }, { status: 400 });
         }
 
-        const status = await updatePlan(
-            body.plan,
-            body.generatePlan,
-            session.user.id,
-            session.user.extension.courses_taken,
-            session.user.extension.degrees
-        );
+        const status = await updatePlan(body.plan, body.generatePlan, session.user.id);
 
         if (!status) {
             throw new Error('Failed to update plan');

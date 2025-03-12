@@ -24,18 +24,21 @@ const fetchPlans = async (userId: string): Promise<Plan[]> => {
 };
 
 // Create a new plan for a user
-const createPlan = async (
-    plan: NewPlan,
-    generatePlan: boolean,
-    userId: string,
-    coursesTaken: Course[],
-    degreesTaking: Degree[]
-): Promise<boolean> => {
+const createPlan = async (plan: NewPlan, generatePlan: boolean, userId: string): Promise<boolean> => {
     const db = client.db('test');
     const users: Collection<UserDocument> = db.collection('users');
 
-    // Default to provided plan
-    let newPlan = { ...plan, _id: new ObjectId() };
+    // Create the new plan with a generated ObjectId
+    const newPlanId = new ObjectId();
+    const newPlan = { ...plan, _id: newPlanId };
+
+    // First, save the plan to the database
+    const saveResult = await users.updateOne({ _id: new ObjectId(userId) }, { $push: { 'extension.plans': newPlan } });
+
+    // Check if save was successful
+    if (saveResult.modifiedCount !== 1) {
+        return false;
+    }
 
     // Optionally generate plan using backend scheduling algorithm
     if (generatePlan) {
@@ -45,28 +48,36 @@ const createPlan = async (
                 throw new Error('BACKEND_API_URL is not defined');
             }
 
+            // Send the userId and planId to the backend
             const response = await fetch(`${backendUrl}/api/generatePlan`, {
                 method: 'POST',
-                body: JSON.stringify({ userId, newPlan, coursesTaken, degreesTaking }),
+                body: JSON.stringify({ userId: userId, planId: newPlanId.toString() }),
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
 
             if (!response.ok) {
-                throw new Error('Failed to generate plan from external backend');
+                console.error('Backend failed to process the plan');
+
+                // Remove the plan we just added
+                await users.updateOne(
+                    { _id: new ObjectId(userId) },
+                    { $pull: { 'extension.plans': { _id: newPlanId } } }
+                );
+
+                return false;
             }
 
-            newPlan = await response.json(); // Use the generated plan
+            // Backend will update the plan directly in the database
+            // No need to get a response or update the plan again here
         } catch (error) {
-            console.error('Error generating plan:', error);
+            console.error('Error notifying backend to generate plan:', error);
             return false; // Fail gracefully
         }
     }
 
-    const result = await users.updateOne({ _id: new ObjectId(userId) }, { $push: { 'extension.plans': newPlan } });
-
-    return result.modifiedCount === 1;
+    return true;
 };
 
 // GET request handler - Fetch plans
@@ -98,13 +109,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Plan data is required' }, { status: 400 });
         }
 
-        const status = await createPlan(
-            body.plan,
-            body.generatePlan,
-            session.user.id,
-            session.user.extension.courses_taken,
-            session.user.extension.degrees
-        );
+        const status = await createPlan(body.plan, body.generatePlan, session.user.id);
 
         if (!status) {
             throw new Error('Failed to create plan');
