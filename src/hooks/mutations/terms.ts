@@ -12,7 +12,7 @@ interface CreateTermProps {
 export const useCreateTerm = () => {
     return useMutation({
         mutationKey: ['terms'],
-        mutationFn: ({ term, planId }: CreateTermProps) => createPlan(term, planId),
+        mutationFn: ({ term, planId }: CreateTermProps) => createTerm(term, planId),
         onSuccess: (_, { term, planId }) => {
             toast({
                 title: `Added Term: ${term.name}`,
@@ -31,7 +31,7 @@ export const useCreateTerm = () => {
     });
 };
 
-const createPlan = async (term: NewTerm, planId: string) => {
+const createTerm = async (term: NewTerm, planId: string) => {
     const response = await fetch(`/api/terms`, {
         method: 'POST',
         body: JSON.stringify({ term, planId }),
