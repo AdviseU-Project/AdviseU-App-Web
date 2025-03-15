@@ -3,25 +3,28 @@ import { ProfileExtension } from './types';
 import { User, Session } from 'next-auth';
 import AdapterUser from '@auth/core/adapters';
 import { JWT } from 'next-auth/jwt';
+import { ObjectId } from 'mongodb';
 
 declare module 'next-auth' {
     interface User extends DefaultUser {
-        extension: ProfileExtension;
+        extension_id: ObjectId;
     }
 
     interface Session {
-        user: User;
+        user: User & {
+            extension?: ProfileExtension | null;
+        };
     }
 }
 
 declare module '@auth/core/adapters' {
     interface AdapterUser {
-        extension: ProfileExtension;
+        extension_id: ObjectId;
     }
 }
 
 declare module 'next-auth/jwt' {
     interface JWT {
-        extension: ProfileExtension;
+        extension_id: ObjectId;
     }
 }
