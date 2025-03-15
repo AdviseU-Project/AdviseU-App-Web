@@ -126,7 +126,7 @@ export default function CoursesSection() {
                     <h4 className="font-semibold mb-2">Added Courses</h4>
                     <ScrollArea className="h-[400px] rounded-md border p-4">
                         <AnimatePresence>
-                            {!session?.user.extension.courses_taken ||
+                            {!session?.user.extension?.courses_taken ||
                             session?.user.extension.courses_taken.length === 0 ? (
                                 <p>No courses added yet.</p>
                             ) : (

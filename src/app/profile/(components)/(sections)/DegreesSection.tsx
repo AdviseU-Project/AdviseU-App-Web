@@ -124,7 +124,7 @@ export default function DegreesSection() {
                     <h4 className="font-semibold mb-2">Added Degrees</h4>
                     <ScrollArea className="h-[400px] rounded-md border p-4">
                         <AnimatePresence>
-                            {!session?.user.extension.degrees || session.user.extension.degrees.length === 0 ? (
+                            {!session?.user.extension?.degrees || session.user.extension.degrees.length === 0 ? (
                                 <p>No degrees added yet.</p>
                             ) : (
                                 session.user.extension.degrees.map((degree: Degree) => (
