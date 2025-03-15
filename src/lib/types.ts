@@ -83,13 +83,14 @@ export type Preferences = {
 };
 
 export type ProfileExtension = {
+    user_id?: ObjectId; // Reference to the user this extension belongs to
     degrees: Degree[];
     user_preferences: Preferences;
     courses_taken: Course[];
     plans: Plan[];
 };
 
-export const defaultExtension: ProfileExtension = {
+export const defaultExtension: Omit<ProfileExtension, 'user_id'> = {
     degrees: [],
     user_preferences: { likes_outdoors: 0 },
     courses_taken: [],

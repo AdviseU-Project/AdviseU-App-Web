@@ -4,23 +4,14 @@ import client from '@/lib/mongodb';
 import { auth } from '@/lib/auth';
 import { Collection, ObjectId } from 'mongodb';
 
-interface UserExtension {
-    courses_taken: Course[];
-}
-
-interface UserDocument {
-    _id: ObjectId;
-    extension?: UserExtension;
-}
-
 // Update an existing course for a user
 const updateUserCourse = async (course: Course, userId: string): Promise<boolean> => {
     const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
-    const result = await users.updateOne(
-        { _id: new ObjectId(userId), 'extension.courses_taken.course_number': course.course_number },
-        { $set: { 'extension.courses_taken.$': course } }
+    const result = await extensionsCollection.updateOne(
+        { user_id: new ObjectId(userId), 'courses_taken.course_number': course.course_number },
+        { $set: { 'courses_taken.$': course } as any }
     );
 
     return result.modifiedCount === 1;
@@ -29,11 +20,11 @@ const updateUserCourse = async (course: Course, userId: string): Promise<boolean
 // Delete a course from a user's profile
 const deleteUserCourse = async (courseId: string, userId: string): Promise<boolean> => {
     const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
-    const result = await users.updateOne(
-        { _id: new ObjectId(userId) },
-        { $pull: { 'extension.courses_taken': { course_number: courseId } } } // Using course_number to identify the course
+    const result = await extensionsCollection.updateOne(
+        { user_id: new ObjectId(userId) },
+        { $pull: { courses_taken: { course_number: courseId } } as any } // Using course_number to identify the course
     );
 
     return result.modifiedCount === 1;
@@ -65,7 +56,6 @@ export async function PUT(req: Request) {
 export async function DELETE(request: Request, { params }: { params: Promise<{ courseId: string }> }) {
     try {
         const courseId = (await params).courseId;
-        console.log(courseId);
 
         const session = await auth();
         if (!session?.user?.id) {

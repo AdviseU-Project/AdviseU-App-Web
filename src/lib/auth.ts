@@ -2,7 +2,7 @@ import NextAuth from 'next-auth';
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import client from './mongodb';
 import authConfig from './auth.config';
-import { defaultExtension } from './types';
+import { defaultExtension, ProfileExtension } from './types';
 import { ObjectId } from 'mongodb';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -11,20 +11,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token.extension = user.extension || null;
-            } else if (!token.extension && token.sub) {
+                // Just store the extension ID reference
+                token.extension_id = user.extension_id || null;
+            } else if (!token.extension_id && token.sub) {
                 // Fetch from DB if missing
                 const db = (await client).db();
                 const dbUser = await db.collection('users').findOne({ _id: new ObjectId(token.sub) });
-                token.extension = dbUser?.extension || null;
+                token.extension_id = dbUser?.extension_id || null;
             }
+
             return token;
         },
         async session({ session, token }) {
-            if (token.extension) {
+            if (token.extension_id) {
                 const db = (await client).db();
-                const dbUser = await db.collection('users').findOne({ _id: new ObjectId(token.sub) });
-                session.user.extension = dbUser?.extension || null;
+                // Fetch the extension data from the extensions collection
+                const extension = await db.collection('extensions').findOne({
+                    _id: new ObjectId(token.extension_id),
+                });
+                session.user.extension = extension as ProfileExtension | null;
             }
             if (token.sub) {
                 session.user.id = token.sub;
@@ -37,9 +42,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         async createUser({ user }) {
             const db = (await client).db();
             const userId = new ObjectId(user.id);
+
+            // Create the extension document
+            const extensionResult = await db.collection('extensions').insertOne({
+                ...defaultExtension,
+                user_id: userId, // Reference back to the user
+            });
+
+            // Update the user with just the extension ID reference
             await db
                 .collection('users')
-                .updateOne({ _id: userId }, { $set: { extension: defaultExtension } }, { upsert: true });
+                .updateOne({ _id: userId }, { $set: { extension_id: extensionResult.insertedId } });
         },
     },
 });

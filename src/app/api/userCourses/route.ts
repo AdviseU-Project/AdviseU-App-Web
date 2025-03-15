@@ -4,39 +4,29 @@ import client from '@/lib/mongodb';
 import { auth } from '@/lib/auth';
 import { Collection, ObjectId } from 'mongodb';
 
-interface UserExtension {
-    courses_taken: Course[];
-}
-
-interface UserDocument {
-    _id: ObjectId;
-    extension?: UserExtension;
-}
-
 // Fetch courses a user has taken
 const fetchUserCourses = async (userId: string): Promise<Course[]> => {
     const db = (await client.connect()).db('test');
-    const collection: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
-    const user = await collection.findOne({ _id: new ObjectId(userId) });
-
-    return user?.extension?.courses_taken ?? [];
+    const extension = await extensionsCollection.findOne({ user_id: new ObjectId(userId) });
+    return extension?.courses_taken ?? [];
 };
 
 // Add a course for a user, preventing duplicates
 const addUserCourse = async (course: Course, userId: string): Promise<boolean> => {
     const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
-    const user = await users.findOne({ _id: new ObjectId(userId) });
+    const extension = await extensionsCollection.findOne({ user_id: new ObjectId(userId) });
 
-    if (user?.extension?.courses_taken?.some((c) => c.course_number === course.course_number)) {
+    if (extension?.courses_taken?.some((c: Course) => c.course_number === course.course_number)) {
         return false; // Course already taken, prevent duplicate insertion
     }
 
-    const result = await users.updateOne(
-        { _id: new ObjectId(userId) },
-        { $push: { 'extension.courses_taken': course } }
+    const result = await extensionsCollection.updateOne(
+        { user_id: new ObjectId(userId) },
+        { $push: { courses_taken: course } as any }
     );
 
     return result.modifiedCount === 1;
