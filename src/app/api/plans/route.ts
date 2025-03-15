@@ -4,36 +4,30 @@ import client from '@/lib/mongodb';
 import { auth } from '@/lib/auth';
 import { Collection, ObjectId } from 'mongodb';
 
-interface UserExtension {
-    plans: Plan[];
-}
-
-interface UserDocument {
-    _id: ObjectId;
-    extension?: UserExtension;
-}
-
 // Fetch plans for a user
 const fetchPlans = async (userId: string): Promise<Plan[]> => {
     const db = (await client.connect()).db('test');
-    const collection: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
-    const user = await collection.findOne({ _id: new ObjectId(userId) });
+    const extension = await extensionsCollection.findOne({ user_id: new ObjectId(userId) });
 
-    return user?.extension?.plans ?? [];
+    return extension?.plans ?? [];
 };
 
 // Create a new plan for a user
 const createPlan = async (plan: NewPlan, generatePlan: boolean, userId: string): Promise<boolean> => {
     const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
     // Create the new plan with a generated ObjectId
     const newPlanId = new ObjectId();
     const newPlan = { ...plan, _id: newPlanId };
 
     // First, save the plan to the database
-    const saveResult = await users.updateOne({ _id: new ObjectId(userId) }, { $push: { 'extension.plans': newPlan } });
+    const saveResult = await extensionsCollection.updateOne(
+        { user_id: new ObjectId(userId) },
+        { $push: { plans: newPlan } as any }
+    );
 
     // Check if save was successful
     if (saveResult.modifiedCount !== 1) {
@@ -69,14 +63,14 @@ const createPlan = async (plan: NewPlan, generatePlan: boolean, userId: string):
 
             // Delete the plan whether it was a fetch failure or a bad response
             try {
-                const removeResult = await users.updateOne(
-                    { _id: new ObjectId(userId) },
+                const removeResult = await extensionsCollection.updateOne(
+                    { user_id: new ObjectId(userId) },
                     {
                         $pull: {
-                            'extension.plans': {
+                            plans: {
                                 _id: newPlanId,
                             },
-                        },
+                        } as any,
                     }
                 );
 

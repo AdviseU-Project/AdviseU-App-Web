@@ -15,23 +15,23 @@ interface UserDocument {
 
 const updatePlan = async (term: Term, userId: string, planId: string): Promise<boolean> => {
     const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
     const termId = new ObjectId(term._id);
 
-    const result = await users.updateOne(
+    const result = await extensionsCollection.updateOne(
         {
-            _id: new ObjectId(userId),
-            'extension.plans._id': new ObjectId(planId),
+            user_id: new ObjectId(userId),
+            'plans._id': new ObjectId(planId),
         },
         {
             $set: {
-                'extension.plans.$.terms.$[term]': {
+                'plans.$.terms.$[term]': {
                     _id: termId,
                     name: term.name,
                     courses: term.courses,
                 },
-            },
+            } as any,
         },
         {
             arrayFilters: [{ 'term._id': termId }],
@@ -69,16 +69,16 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 // Delete an existing plan for a user
 const deletePlan = async (planId: string, userId: string, termId: string): Promise<boolean> => {
     const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
-    const result = await users.updateOne(
-        { _id: new ObjectId(userId), 'extension.plans._id': new ObjectId(planId) },
+    const result = await extensionsCollection.updateOne(
+        { user_id: new ObjectId(userId), 'plans._id': new ObjectId(planId) },
         {
             $pull: {
-                'extension.plans.$.terms': {
+                'plans.$.terms': {
                     _id: new ObjectId(termId),
                 },
-            },
+            } as any,
         }
     );
 

@@ -4,19 +4,10 @@ import client from '@/lib/mongodb';
 import { auth } from '@/lib/auth';
 import { Collection, ObjectId } from 'mongodb';
 
-interface UserExtension {
-    plans: Plan[];
-}
-
-interface UserDocument {
-    _id: ObjectId;
-    extension?: UserExtension;
-}
-
 // Create a new term for a user
 const createTerm = async (userId: string, planId: string, newTerm: NewTerm): Promise<boolean> => {
     const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
     const term = {
         _id: new ObjectId(),
@@ -24,12 +15,12 @@ const createTerm = async (userId: string, planId: string, newTerm: NewTerm): Pro
         courses: (newTerm.courses ?? []) as Course[],
     } as Term;
 
-    const result = await users.updateOne(
-        { _id: new ObjectId(userId), 'extension.plans._id': new ObjectId(planId) },
+    const result = await extensionsCollection.updateOne(
+        { user_id: new ObjectId(userId), 'plans._id': new ObjectId(planId) },
         {
             $push: {
-                'extension.plans.$.terms': term,
-            },
+                'plans.$.terms': term,
+            } as any,
         }
     );
 

@@ -4,37 +4,30 @@ import client from '@/lib/mongodb';
 import { auth } from '@/lib/auth';
 import { Collection, ObjectId } from 'mongodb';
 
-interface UserExtension {
-    degrees: Degree[];
-}
-
-interface UserDocument {
-    _id: ObjectId;
-    extension?: UserExtension;
-}
-
 // Fetch degrees for a user
 const fetchUserDegrees = async (userId: string): Promise<Degree[]> => {
     const db = (await client.connect()).db('test');
-    const collection: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
-    const user = await collection.findOne({ _id: new ObjectId(userId) });
-
-    return user?.extension?.degrees ?? [];
+    const extension = await extensionsCollection.findOne({ user_id: new ObjectId(userId) });
+    return extension?.degrees ?? [];
 };
 
 // Add a degree for a user, preventing duplicates
 const addUserDegree = async (degree: Degree, userId: string): Promise<boolean> => {
     const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
-    const user = await users.findOne({ _id: new ObjectId(userId) });
+    const extension = await extensionsCollection.findOne({ user_id: new ObjectId(userId) });
 
-    if (user?.extension?.degrees?.some((d) => d.program_name === degree.program_name)) {
+    if (extension?.degrees?.some((d: Degree) => d.program_name === degree.program_name)) {
         return false; // Degree already exists, prevent duplicate insertion
     }
 
-    const result = await users.updateOne({ _id: new ObjectId(userId) }, { $push: { 'extension.degrees': degree } });
+    const result = await extensionsCollection.updateOne(
+        { user_id: new ObjectId(userId) },
+        { $push: { degrees: degree } as any }
+    );
 
     return result.modifiedCount === 1;
 };

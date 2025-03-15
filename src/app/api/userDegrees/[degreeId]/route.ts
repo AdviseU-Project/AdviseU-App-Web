@@ -4,23 +4,14 @@ import client from '@/lib/mongodb';
 import { auth } from '@/lib/auth';
 import { Collection, ObjectId } from 'mongodb';
 
-interface UserExtension {
-    degrees: Degree[];
-}
-
-interface UserDocument {
-    _id: ObjectId;
-    extension?: UserExtension;
-}
-
 // Update an existing degree for a user
 const updateUserDegree = async (degree: Degree, userId: string): Promise<boolean> => {
     const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
-    const result = await users.updateOne(
-        { _id: new ObjectId(userId), 'extension.degrees.program_name': degree.program_name },
-        { $set: { 'extension.degrees.$': degree } }
+    const result = await extensionsCollection.updateOne(
+        { user_id: new ObjectId(userId), 'degrees.program_name': degree.program_name },
+        { $set: { 'degrees.$': degree } as any }
     );
 
     return result.modifiedCount === 1;
@@ -29,11 +20,11 @@ const updateUserDegree = async (degree: Degree, userId: string): Promise<boolean
 // Delete a degree from a user's profile
 const deleteUserDegree = async (degreeId: string, userId: string): Promise<boolean> => {
     const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
-    const result = await users.updateOne(
-        { _id: new ObjectId(userId) },
-        { $pull: { 'extension.degrees': { program_name: degreeId } } } // Using program_name to identify the degree
+    const result = await extensionsCollection.updateOne(
+        { user_id: new ObjectId(userId) },
+        { $pull: { degrees: { program_name: degreeId } } as any } // Using program_name to identify the degree
     );
 
     return result.modifiedCount === 1;
@@ -65,7 +56,6 @@ export async function PUT(req: Request) {
 export async function DELETE(request: Request, { params }: { params: Promise<{ degreeId: string }> }) {
     try {
         const degreeId = (await params).degreeId;
-        console.log(degreeId);
 
         const session = await auth();
         if (!session?.user?.id) {

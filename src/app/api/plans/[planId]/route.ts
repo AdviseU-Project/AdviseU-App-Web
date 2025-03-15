@@ -4,34 +4,25 @@ import client from '@/lib/mongodb';
 import { auth } from '@/lib/auth';
 import { Collection, ObjectId } from 'mongodb';
 
-interface UserExtension {
-    plans: Plan[];
-}
-
-interface UserDocument {
-    _id: ObjectId;
-    extension?: UserExtension;
-}
-
 // Update an existing plan for a user
 const updatePlan = async (plan: Plan, generatePlan: boolean, userId: string): Promise<boolean> => {
     const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
     const planId = new ObjectId(plan._id);
 
-    // First, update the plan in the database
-    const updateResult = await users.updateOne(
-        { _id: new ObjectId(userId), 'extension.plans._id': planId },
+    // Update the plan in the database
+    const updateResult = await extensionsCollection.updateOne(
+        { user_id: new ObjectId(userId), 'plans._id': planId },
         {
             $set: {
-                'extension.plans.$': {
+                'plans.$': {
                     _id: planId,
                     name: plan.name,
                     description: plan.description,
                     terms: plan.terms,
                 },
-            },
+            } as any,
         }
     );
 
@@ -105,16 +96,16 @@ export async function PUT(req: Request) {
 // Delete an existing plan for a user
 const deletePlan = async (planId: string, userId: string): Promise<boolean> => {
     const db = client.db('test');
-    const users: Collection<UserDocument> = db.collection('users');
+    const extensionsCollection = db.collection('extensions');
 
-    const result = await users.updateOne(
-        { _id: new ObjectId(userId) },
+    const result = await extensionsCollection.updateOne(
+        { user_id: new ObjectId(userId) },
         {
             $pull: {
-                'extension.plans': {
+                plans: {
                     _id: new ObjectId(planId),
                 },
-            },
+            } as any,
         }
     );
 
