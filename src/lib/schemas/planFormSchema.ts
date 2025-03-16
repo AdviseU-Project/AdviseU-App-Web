@@ -8,6 +8,9 @@ export const planFormSchema = z.object({
         .max(40, { message: 'Plan name cannot exceed 40 characters' }),
     description: z
         .string()
-        .min(10, { message: 'Description must be at least 10 characters' })
-        .max(200, { message: 'Description cannot exceed 200 characters' }),
+        .optional()
+        .transform((val) => val || '')
+        .refine((val) => val.length <= 200, {
+            message: 'Description cannot exceed 200 characters',
+        }),
 });
