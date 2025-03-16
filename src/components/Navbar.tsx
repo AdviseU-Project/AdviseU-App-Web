@@ -50,17 +50,7 @@ const Navbar: React.FC = async () => {
 
                 {/* Authentication and mobile menu */}
                 <div className="flex items-center gap-2">
-                    {session?.user ? (
-                        <div className="relative group">
-                            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-600 opacity-0 group-hover:opacity-20 transition-opacity duration-300 rounded-md"></div>
-                            <SignOut />
-                        </div>
-                    ) : (
-                        <div className="relative group">
-                            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-600 opacity-0 group-hover:opacity-20 transition-opacity duration-300 rounded-md"></div>
-                            <SignIn />
-                        </div>
-                    )}
+                    {session?.user ? <SignOut /> : <SignIn />}
 
                     {/* Mobile menu client component */}
                     <div className="md:hidden">

@@ -8,8 +8,10 @@ export default function SignIn() {
                 'use server';
                 await signIn('google');
             }}
+            className="relative group"
         >
-            <Button variant="outline" type="submit">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-600 opacity-0 group-hover:opacity-20 transition-opacity duration-300 rounded-md pointer-events-none"></div>
+            <Button variant="outline" type="submit" className="bg-gray-50 hover:bg-gray-100 border border-gray-300">
                 Log In
             </Button>
         </form>
