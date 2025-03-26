@@ -1,16 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X, BookOpen, GraduationCap, Calendar, CheckCircle, Brain } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { BookOpen, GraduationCap, Calendar, CheckCircle, Brain } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
 interface LoadingOverlayProps {
     isLoading: boolean;
-    onClose?: () => void;
+    onClose?: () => void; // Kept for API compatibility but not used
 }
 
-const LoadingOverlay = ({ isLoading, onClose }: LoadingOverlayProps) => {
+const LoadingOverlay = ({ isLoading }: LoadingOverlayProps) => {
     const [progress, setProgress] = useState(0);
     const [tipIndex, setTipIndex] = useState(0);
     const [mounted, setMounted] = useState(false);
@@ -52,8 +51,17 @@ const LoadingOverlay = ({ isLoading, onClose }: LoadingOverlayProps) => {
     // Set mounted state when component mounts
     useEffect(() => {
         setMounted(true);
-        return () => setMounted(false);
-    }, []);
+
+        // Lock scroll when overlay is shown
+        if (isLoading) {
+            document.body.style.overflow = 'hidden';
+        }
+
+        return () => {
+            setMounted(false);
+            document.body.style.overflow = '';
+        };
+    }, [isLoading]);
 
     // Update progress bar
     useEffect(() => {
@@ -88,24 +96,33 @@ const LoadingOverlay = ({ isLoading, onClose }: LoadingOverlayProps) => {
 
     const currentTip = educationalTips[tipIndex];
 
+    // Prevent any click events from bubbling through
+    const stopPropagation = (e: React.MouseEvent) => {
+        e.stopPropagation();
+    };
+
     const overlayContent = (
         <div
-            className="fixed top-0 left-0 right-0 bottom-0 w-full h-full z-[9999] flex items-center justify-center bg-black/40"
-            style={{ position: 'fixed' }}
+            className="fixed top-0 left-0 right-0 bottom-0 w-full h-full z-[9999] flex items-center justify-center bg-black/60"
+            style={{
+                position: 'fixed',
+                pointerEvents: 'all',
+                width: '100vw',
+                height: '100vh',
+            }}
+            onClick={stopPropagation}
         >
-            <div className="relative w-full max-w-md mx-auto bg-white rounded-lg shadow-xl overflow-hidden border-0">
-                {onClose && (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={onClose}
-                        className="absolute right-2 top-2 z-10 h-8 w-8 rounded-full bg-black/20 text-white hover:bg-black/40"
-                    >
-                        <X className="h-4 w-4" />
-                    </Button>
-                )}
+            <div
+                className="relative w-full max-w-md mx-auto bg-white rounded-lg shadow-xl overflow-hidden border-0"
+                onClick={stopPropagation}
+                style={{ pointerEvents: 'all', position: 'relative', zIndex: 10000 }}
+            >
+                {/* Close button removed */}
 
-                <div className="p-8 bg-white flex flex-col items-center justify-center min-h-[300px]">
+                <div
+                    className="p-8 bg-white flex flex-col items-center justify-center min-h-[300px]"
+                    style={{ pointerEvents: 'all' }}
+                >
                     <div className="animate-bounce">{currentTip.icon}</div>
 
                     <h3 className="text-xl font-bold text-orange-600 mb-2 text-center">{currentTip.title}</h3>
@@ -132,7 +149,10 @@ const LoadingOverlay = ({ isLoading, onClose }: LoadingOverlayProps) => {
     );
 
     // Use a portal to render the overlay directly into the document body
-    return createPortal(overlayContent, document.body);
+    return createPortal(
+        <div style={{ pointerEvents: 'auto', position: 'absolute', inset: 0, zIndex: 9999 }}>{overlayContent}</div>,
+        document.body
+    );
 };
 
 export default LoadingOverlay;
