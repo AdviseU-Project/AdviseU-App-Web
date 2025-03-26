@@ -2,6 +2,8 @@
 
 ## Overview
 
+[Launched here!](https://adviseu.app)
+
 AdviseU-App-Web is the frontend for AdviseU, a web application designed to assist students and advisors at Oregon State University in generating optimal course plans based on degree requirements, preferences, interests, course difficulty, and availability. This repository houses the Next.js application that serves as the user interface for AdviseU.
 
 ## Features
