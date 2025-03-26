@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { X, BookOpen, GraduationCap, Calendar, CheckCircle, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
