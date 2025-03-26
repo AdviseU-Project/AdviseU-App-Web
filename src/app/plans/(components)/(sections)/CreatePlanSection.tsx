@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { planFormSchema } from '@/lib/schemas/planFormSchema';
-import LoadingOverlay from '../LoadingOverlay';
+import LoadingOverlay from '../YouTubeLoadingOverlay'; // Use '../YouTubeLoadingOverlay' for YouTube Shorts loading screen or '../LoadingOverlay' for normal loading screen
 
 type PlanFormValues = z.infer<typeof planFormSchema>;
 
