@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,6 +12,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { planFormSchema } from '@/lib/schemas/planFormSchema';
+import LoadingOverlay from '../LoadingOverlay';
 
 type PlanFormValues = z.infer<typeof planFormSchema>;
 
@@ -19,7 +21,9 @@ interface CreatePlanSectionProps {
 }
 
 const CreatePlanSection = ({ onPlanCreated }: CreatePlanSectionProps) => {
-    const { mutate, isPending } = useCreatePlan();
+    const { mutate, isPending, isSuccess } = useCreatePlan();
+    const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
 
     // Initialize the form
     const form = useForm<PlanFormValues>({
@@ -37,19 +41,47 @@ const CreatePlanSection = ({ onPlanCreated }: CreatePlanSectionProps) => {
             terms: [],
         };
 
-        mutate({ plan: newPlan, generate });
-
-        // Reset form after submission
-        form.reset();
-
-        // Call the callback if provided
-        if (onPlanCreated) {
-            onPlanCreated();
+        if (generate) {
+            setIsGenerating(true);
+            setShowLoadingOverlay(true);
         }
+
+        mutate(
+            { plan: newPlan, generate },
+            {
+                onSuccess: () => {
+                    // Reset form after submission
+                    form.reset();
+
+                    // Hide loading overlay
+                    setShowLoadingOverlay(false);
+                    setIsGenerating(false);
+
+                    // Call the callback if provided
+                    if (onPlanCreated) {
+                        onPlanCreated();
+                    }
+                },
+                onError: () => {
+                    // Hide loading overlay on error too
+                    setShowLoadingOverlay(false);
+                    setIsGenerating(false);
+                },
+            }
+        );
     };
 
     return (
-        <div className="space-y-5">
+        <div className="space-y-5 relative">
+            <LoadingOverlay
+                isLoading={showLoadingOverlay}
+                onClose={() => {
+                    if (!isPending) {
+                        setShowLoadingOverlay(false);
+                    }
+                }}
+            />
+
             <Form {...form}>
                 <form
                     onSubmit={(e) => {
@@ -103,18 +135,19 @@ const CreatePlanSection = ({ onPlanCreated }: CreatePlanSectionProps) => {
                     <div className="pt-3 flex flex-col sm:flex-row gap-3">
                         <Button
                             type="submit"
-                            disabled={isPending}
+                            disabled={isPending || isGenerating}
                             className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-medium"
                         >
                             <Plus className="mr-2 h-5 w-5" /> Create Plan
                         </Button>
                         <Button
                             type="button"
-                            disabled={isPending || !form.formState.isValid}
+                            disabled={isPending || !form.formState.isValid || isGenerating}
                             onClick={() => form.handleSubmit((values) => onSubmit(values, true))()}
                             className="sm:flex-none sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium"
                         >
-                            <Wand className="mr-2 h-5 w-5" /> Generate Plan
+                            <Wand className="mr-2 h-5 w-5" />{' '}
+                            {isPending && isGenerating ? 'Generating...' : 'Generate Plan'}
                         </Button>
                     </div>
                 </form>
