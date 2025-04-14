@@ -11,6 +11,7 @@ import CourseSearchBar from './(components)/(sections)/CourseSearchBarSection';
 import DegreeInfoSection from './(components)/(sections)/DegreeInfoSection';
 import { useSession } from 'next-auth/react';
 import PlanOverviewSection from './(components)/(sections)/PlanOverviewSection';
+import PageHeaderSection from './(components)/(sections)/PageHeaderSection';
 
 interface PlanPageClientProps {
     planId: string;
@@ -122,6 +123,9 @@ export default function PlanPageClient({ planId }: PlanPageClientProps) {
             modifiers={[restrictToWindowEdges]}
         >
             <div className="min-h-screen bg-gray-50">
+                {/* Page Header */}
+                <PageHeaderSection plan={plan} />
+
                 {/* Dashboard Content */}
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex flex-col md:flex-row gap-6">
