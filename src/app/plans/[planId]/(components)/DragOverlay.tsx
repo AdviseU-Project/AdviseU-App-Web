@@ -19,7 +19,7 @@ const DragOverlay: React.FC<DragOverlayProps> = ({ activeCourse }) => {
         >
             {activeCourse ? (
                 <div
-                    className="bg-white shadow-lg rounded-lg border-2 border-orange-400 p-1 w-[268px]"
+                    className="bg-white shadow-md rounded-lg border-2 border-blue-400 p-1 w-[268px] relative"
                     style={{
                         cursor: 'grabbing',
                         transform: 'scale(1.05)',

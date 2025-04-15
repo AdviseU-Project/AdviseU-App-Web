@@ -2,14 +2,14 @@
 
 import React, { useState } from 'react';
 import { Button, ButtonProps } from '@/components/ui/button';
-import { Dialog, DialogTrigger, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogHeader, DialogFooter } from '@/components/ui/dialog';
 import { Form, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { SelectDropdown } from '@/components/SelectDropdown';
-import { Plus } from 'lucide-react';
+import { Calendar, CheckCircle, Plus } from 'lucide-react';
 import { useCreateTerm } from '@/hooks/mutations/terms';
 import { useSession } from 'next-auth/react';
 
@@ -26,13 +26,13 @@ const FormSchema = z.object({
 
 const AddTermDialog: React.FC<AddTermDialogProps> = ({ variant, planId }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const { mutate } = useCreateTerm();
+    const { mutate, isPending } = useCreateTerm();
     const { data } = useSession();
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            term: 'Select a Term',
+            term: '',
         },
     });
 
@@ -45,10 +45,8 @@ const AddTermDialog: React.FC<AddTermDialogProps> = ({ variant, planId }) => {
         });
 
         form.reset({
-            term: 'Select a Term',
+            term: '',
         });
-
-        handleClose();
     }
 
     const availableTerms = [
@@ -81,31 +79,55 @@ const AddTermDialog: React.FC<AddTermDialogProps> = ({ variant, planId }) => {
                         <Plus />
                     </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <div className="mx-auto bg-gray-100 p-3 rounded-full mb-2">
+                            <Calendar className="h-6 w-6 text-gray-600" />
+                        </div>
+                        <DialogTitle className="text-center text-xl">Add Academic Term</DialogTitle>
+                    </DialogHeader>
+
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-2">
                             <FormField
                                 control={form.control}
                                 name="term"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <DialogTitle asChild>
-                                            <FormLabel>Add Term</FormLabel>
-                                        </DialogTitle>
+                                        <FormLabel className="text-sm font-medium text-gray-700">Select Term</FormLabel>
                                         <SelectDropdown
-                                            placeholder="Select a Term"
-                                            label="Select Term"
+                                            placeholder="Choose academic term"
+                                            label="Available Terms"
                                             options={availableTerms}
                                             value={field.value}
                                             onValueChange={field.onChange}
                                         />
-                                        <FormDescription>Select the term you would like to add</FormDescription>
-                                        <FormMessage>{form.formState.errors.term?.message}</FormMessage>
+                                        <FormDescription className="text-xs text-gray-500">
+                                            Select the academic term you want to add to your plan
+                                        </FormDescription>
+                                        <FormMessage className="text-red-500" />
                                     </FormItem>
                                 )}
                             />
 
-                            <Button type="submit">Confirm</Button>
+                            <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-2 pt-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleClose}
+                                    className="sm:flex-1 border-gray-200"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={isPending || !form.formState.isValid}
+                                    className="sm:flex-1 gap-2"
+                                >
+                                    <CheckCircle className="h-4 w-4" />
+                                    {isPending ? 'Adding...' : 'Add Term'}
+                                </Button>
+                            </DialogFooter>
                         </form>
                     </Form>
                 </DialogContent>

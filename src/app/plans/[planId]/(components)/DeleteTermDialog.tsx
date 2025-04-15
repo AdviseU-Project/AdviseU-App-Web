@@ -11,7 +11,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { X } from 'lucide-react';
+import { X, AlertTriangle, Trash2 } from 'lucide-react';
 import { Term } from '@/lib/types';
 import { useDeleteTerm } from '@/hooks/mutations/terms';
 import { useTermsStore } from '@/app/store';
@@ -40,24 +40,37 @@ const DeleteTermDialog: React.FC<DeleteTermDialogProps> = ({ term, planId }) => 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-4 w-4 text-gray-600 hover:text-red-500">
-                    <X />
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                >
+                    <X className="h-4 w-4" />
                 </Button>
             </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Delete Term</DialogTitle>
-                    <DialogDescription>
-                        Are you sure you want to delete the term "{term.name}"? This action cannot be undone and all
-                        courses in this term will be removed from your plan.
+            <DialogContent className="max-w-md">
+                <DialogHeader className="space-y-3">
+                    <div className="mx-auto bg-red-50 p-3 rounded-full">
+                        <AlertTriangle className="h-6 w-6 text-red-500" />
+                    </div>
+                    <DialogTitle className="text-center text-xl">Delete Term</DialogTitle>
+                    <DialogDescription className="text-center">
+                        Are you sure you want to delete <span className="font-semibold text-gray-700">{term.name}</span>
+                        ? This action cannot be undone and all courses in this term will be removed from your plan.
                     </DialogDescription>
                 </DialogHeader>
-                <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsOpen(false)}>
+                <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-2">
+                    <Button variant="outline" onClick={() => setIsOpen(false)} className="sm:flex-1">
                         Cancel
                     </Button>
-                    <Button variant="destructive" onClick={handleDeleteTerm} disabled={isPending}>
-                        {isPending ? 'Deleting...' : 'Delete'}
+                    <Button
+                        variant="destructive"
+                        onClick={handleDeleteTerm}
+                        disabled={isPending}
+                        className="sm:flex-1 gap-2"
+                    >
+                        <Trash2 className="h-4 w-4" />
+                        {isPending ? 'Deleting...' : 'Delete Term'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

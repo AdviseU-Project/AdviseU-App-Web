@@ -23,13 +23,13 @@ const DroppableTermContainer: React.FC<DroppableTermContainerProps> = ({ term, c
     return (
         <div
             ref={setNodeRef}
-            className={`flex flex-col gap-2 transition-all duration-300 rounded-lg ${
-                isOver ? 'bg-blue-50 scale-[1.02] shadow-inner' : isActive ? 'bg-orange-50/50' : ''
+            className={`flex flex-col gap-2 transition-all duration-300 rounded-lg p-2 ${
+                isOver
+                    ? 'bg-blue-50 border-2 border-dashed border-blue-300'
+                    : isActive
+                    ? `bg-gray-50 border border-blue-500`
+                    : 'border border-transparent'
             }`}
-            style={{
-                // Adding a subtle border only when dragging over
-                border: isOver ? '2px dashed rgba(59, 130, 246, 0.5)' : '2px solid transparent',
-            }}
         >
             {children}
         </div>
