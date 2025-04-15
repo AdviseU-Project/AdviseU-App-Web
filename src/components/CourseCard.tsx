@@ -38,7 +38,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, term, isDraggable = tru
             ref={setNodeRef}
             {...attributes}
             {...listeners}
-            className={`min-w-64 max-h-24 max-w-80 p-3 mt-0 rounded-lg border bg-white hover:bg-gray-50 transition-all  `}
+            className={`min-w-64 max-h-24 max-w-80 p-3 mt-0 rounded-lg border bg-white hover:bg-gray-50 transition-all touch-none`}
             id={course._id.toString()}
         >
             <div className="flex justify-between w-full">
