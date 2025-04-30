@@ -65,7 +65,12 @@ const AddTermDialog: React.FC<AddTermDialogProps> = ({ variant, planId }) => {
         'Fall 2027',
         'Winter 2028',
         'Spring 2028',
-    ].filter((term) => !data?.user?.extension?.plans.find((plan) => plan.terms.find((t) => t.name === term)));
+    ].filter(
+        (termName) =>
+            !data?.user?.extension?.plans
+                .find((plan) => plan._id === planId)
+                ?.terms.find((existingTerm) => termName === existingTerm.name)
+    );
 
     const handleOpen = () => setIsOpen(true);
     const handleClose = () => setIsOpen(false);
