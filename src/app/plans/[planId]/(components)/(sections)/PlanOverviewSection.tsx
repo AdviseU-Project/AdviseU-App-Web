@@ -67,15 +67,15 @@ const PlanOverviewSection: React.FC<PlanOverviewSectionProps> = ({ plan, planId 
                 </div>
 
                 {!plan.terms || plan.terms.length === 0 ? (
-                    <div className="text-center py-12 px-4 bg-gray-50">
-                        <div className="bg-gray-100 rounded-full p-3 mx-auto w-fit mb-3">
-                            <Calendar className="h-8 w-8 text-gray-400" />
+                    <div className="text-center py-12 px-4 bg-white">
+                        <div className="bg-orange-100 rounded-full p-3 mx-auto w-fit mb-3">
+                            <Calendar className="h-8 w-8 text-orange-600" />
                         </div>
                         <h3 className="text-lg font-medium text-gray-800 mb-2">No Terms Added Yet</h3>
                         <p className="text-gray-600 mb-5 max-w-md mx-auto">
                             Start building your academic plan by adding terms for each quarter or semester.
                         </p>
-                        <AddTermDialog planId={planId} variant="default" />
+                        <AddTermDialog planId={planId} variant="orange" />
                     </div>
                 ) : (
                     <>

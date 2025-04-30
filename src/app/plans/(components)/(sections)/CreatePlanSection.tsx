@@ -133,11 +133,7 @@ const CreatePlanSection = ({ onPlanCreated }: CreatePlanSectionProps) => {
                     />
 
                     <div className="pt-3 flex flex-col sm:flex-row gap-3">
-                        <Button
-                            type="submit"
-                            disabled={isPending || isGenerating}
-                            className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-medium"
-                        >
+                        <Button type="submit" disabled={isPending || isGenerating} variant="orange">
                             <Plus className="mr-2 h-5 w-5" /> Create Plan
                         </Button>
                         <Button

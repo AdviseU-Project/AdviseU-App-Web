@@ -12,6 +12,7 @@ import DegreeInfoSection from './(components)/(sections)/DegreeInfoSection';
 import { useSession } from 'next-auth/react';
 import PlanOverviewSection from './(components)/(sections)/PlanOverviewSection';
 import PageHeaderSection from './(components)/(sections)/PageHeaderSection';
+import { sortTerms } from '@/lib/utils';
 
 interface PlanPageClientProps {
     planId: string;
@@ -128,8 +129,8 @@ export default function PlanPageClient({ planId }: PlanPageClientProps) {
                 <PageHeaderSection plan={plan} />
 
                 {/* Dashboard Content */}
-                <div className="container mx-auto px-4 py-6">
-                    <div className="flex flex-col md:flex-row gap-6">
+                <div className="container mx-auto px-4 -mt-32">
+                    <div className="flex flex-col md:flex-row gap-6 min-w-full">
                         <div className="md:w-3/4 space-y-6">
                             <CourseSearchBar planId={planId} />
                             <PlanOverviewSection plan={plan} planId={planId} />

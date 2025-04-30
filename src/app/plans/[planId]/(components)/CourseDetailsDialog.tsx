@@ -3,7 +3,7 @@
 import { Course } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, ArrowLeft, Building, Calendar, CheckCircle, Clock, Info, X } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Building, Calendar, CheckCircle, Clock, Info } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
@@ -11,7 +11,6 @@ import {
     DialogTitle,
     DialogDescription,
     DialogFooter,
-    DialogClose,
 } from '@/components/ui/dialog';
 import { useState } from 'react';
 import { DialogTrigger } from '@radix-ui/react-dialog';

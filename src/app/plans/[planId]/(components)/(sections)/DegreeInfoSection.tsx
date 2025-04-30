@@ -1,10 +1,9 @@
 // Icons
-import { GraduationCap, Info, CheckCircle, Clock, Lightbulb, BookOpen, AlertTriangle } from 'lucide-react';
+import { GraduationCap, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 
 // Components
 import { Badge } from '@/components/ui/badge';
 import { Plan } from '@/lib/types';
-import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 
 interface DegreeInfoSectionProps {

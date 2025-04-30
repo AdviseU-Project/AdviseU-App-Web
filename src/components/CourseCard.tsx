@@ -1,10 +1,7 @@
 import React from 'react';
 import { Course, Term } from '@/lib/types';
 import { useDraggable } from '@dnd-kit/core';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash } from 'lucide-react';
-import { useUpdateTerm } from '@/hooks/mutations/terms';
 import CourseDetailsDialog from '@/app/plans/[planId]/(components)/CourseDetailsDialog';
 import DeleteCourseDialog from '@/app/plans/[planId]/(components)/DeleteCourseDialog';
 

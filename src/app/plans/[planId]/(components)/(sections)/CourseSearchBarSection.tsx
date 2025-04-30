@@ -6,11 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Search, SlidersHorizontal, X, BookOpen, Lightbulb } from 'lucide-react';
 import { useFetchCourses } from '@/hooks/queries/useFetchCourses';
 import { useDebounce } from '@/hooks/use-debounce';
-import AddTermDialog from '../AddTermDialog';
 import CourseCard from '@/components/CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import CourseDetailsDialog from '../CourseDetailsDialog';
 
 interface CourseSearchBarSectionProps {
     planId: string;
@@ -65,7 +63,6 @@ const CourseSearchBarSection: React.FC<CourseSearchBarSectionProps> = ({ planId 
                         <SlidersHorizontal className="h-4 w-4 mr-2" />
                         Filters
                     </Button>
-                    <AddTermDialog planId={planId} variant="default" />
                 </div>
             </div>
 
