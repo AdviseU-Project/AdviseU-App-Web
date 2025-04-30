@@ -114,6 +114,7 @@ export default function PlanPageClient({ planId }: PlanPageClientProps) {
     if (!plan) {
         return null;
     }
+    sortTerms(plan.terms);
 
     return (
         <DndContext
