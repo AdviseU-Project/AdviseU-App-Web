@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import shortsIds from '@/lib/YouTubeShortsIds/shortsIds';
 
 interface LoadingOverlayProps {
     isLoading: boolean;
@@ -14,17 +15,6 @@ const YouTubeLoadingOverlay = ({ isLoading, onClose }: LoadingOverlayProps) => {
     const [progress, setProgress] = useState(0);
     const [mounted, setMounted] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
-
-    // List of YouTube Shorts IDs
-    const shortsIds = [
-        'bbI6_A7RP7o',
-        'ujED5HrXRjI',
-        'PK4dqWAxXZY',
-        '4U9pfkg7mA8',
-        'Hy5naxJRODg',
-        'yXaSxg4JTwA',
-        'oc991pjpMkI',
-    ];
 
     // Set mounted state when component mounts and pick a random starting point
     useEffect(() => {
