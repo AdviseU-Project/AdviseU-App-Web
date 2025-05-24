@@ -35,15 +35,15 @@ const Navbar: React.FC = async () => {
                     <nav className="hidden md:flex items-center space-x-8">
                         <Link
                             className="font-medium text-gray-700 hover:text-orange-600 transition-colors relative py-1.5 after:absolute after:w-0 after:h-0.5 after:bg-orange-500 after:left-0 after:bottom-0 after:transition-all hover:after:w-full"
-                            href="/plans"
-                        >
-                            Your Plans
-                        </Link>
-                        <Link
-                            className="font-medium text-gray-700 hover:text-orange-600 transition-colors relative py-1.5 after:absolute after:w-0 after:h-0.5 after:bg-orange-500 after:left-0 after:bottom-0 after:transition-all hover:after:w-full"
                             href="/profile"
                         >
                             Profile
+                        </Link>
+                        <Link
+                            className="font-medium text-gray-700 hover:text-orange-600 transition-colors relative py-1.5 after:absolute after:w-0 after:h-0.5 after:bg-orange-500 after:left-0 after:bottom-0 after:transition-all hover:after:w-full"
+                            href="/plans"
+                        >
+                            Your Plans
                         </Link>
                     </nav>
                 </div>
