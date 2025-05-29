@@ -25,7 +25,7 @@ export const scrolltoHash = function (element_id: string) {
 };
 
 // Sorts terms by year and season
-const seasonOrder = ['Summer', 'Fall', 'Winter', 'Spring'];
+const seasonOrder = ['Winter', 'Spring', 'Summer', 'Fall'];
 export const sortTerms = (terms: Term[]) => {
     terms.sort((a, b) => {
         const aParts = a.name.split(' ');
@@ -39,10 +39,8 @@ export const sortTerms = (terms: Term[]) => {
         if (a.name === b.name) {
             return 0;
         } else if (aYear < bYear) {
-            console.log(a.name, 'less than', b.name);
             return -1;
         } else if (bYear < aYear) {
-            console.log(b.name, 'less than', a.name);
             return 1;
         } else if (seasonOrder.indexOf(aSeason) < seasonOrder.indexOf(bSeason)) {
             return -1;
